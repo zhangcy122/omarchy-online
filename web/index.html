@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omarchy Online ~ Web Desktop</title>
+  <link rel="icon" type="image/png" href="assets/icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 1. Omarchy Top Bar (Waybar / Quickshell Emulation) -->
+  <header id="omarchy-bar">
+    <div class="bar-section">
+      <!-- Omarchy Menu Launcher Button -->
+      <button class="bar-button omarchy-logo-btn" id="omarchy-menu-btn" title="Launch Omarchy Menu (Alt + Space)">
+        <img src="assets/logo-white.svg" alt="Omarchy Logo">
+      </button>
+
+      <!-- Hyprland Workspaces 1-9 -->
+      <div class="workspace-list" id="workspaces">
+        <div class="ws-item active" data-ws="1">1</div>
+        <div class="ws-item" data-ws="2">2</div>
+        <div class="ws-item" data-ws="3">3</div>
+        <div class="ws-item" data-ws="4">4</div>
+        <div class="ws-item" data-ws="5">5</div>
+        <div class="ws-item" data-ws="6">6</div>
+        <div class="ws-item" data-ws="7">7</div>
+        <div class="ws-item" data-ws="8">8</div>
+        <div class="ws-item" data-ws="9">9</div>
+      </div>
+    </div>
+
+    <!-- Center: Window Title & Clock -->
+    <div class="bar-section">
+      <div class="bar-clock" id="omarchy-clock">
+        <span id="clock-date" class="clock-date">Sat Sep 26</span>
+        <span id="clock-time">15:30:00</span>
+      </div>
+    </div>
+
+    <!-- Right: Agent Status, Controls & Hotkey Hints -->
+    <div class="bar-section">
+      <div class="agent-pill" id="agent-badge" title="AI Coding Agent: Active">
+        <span class="pulse-dot"></span>
+        <span>Hermes Agent</span>
+      </div>
+
+      <button class="bar-button" id="fullscreen-btn" title="Toggle Fullscreen & Lock Keyboard">
+        <span>⛶</span>
+      </button>
+
+      <span class="badge-key" title="Launcher shortcut">Alt + Space</span>
+    </div>
+  </header>
+
+  <!-- 2. Main Terminal Tiling Viewport -->
+  <main id="viewport-container">
+    <iframe id="terminal-frame" src="/zellij/" allow="clipboard-read; clipboard-write; fullscreen"></iframe>
+  </main>
+
+  <!-- 3. Walker Modal Launcher (omarchy.menu / Walker Emulation) -->
+  <div class="modal-overlay" id="walker-modal">
+    <div class="walker-window">
+      <div class="walker-search-box">
+        <img src="assets/icon.png" alt="Omarchy Icon" class="walker-logo">
+        <input type="text" id="walker-input" placeholder="Search commands, apps, agents, or workspaces..." autocomplete="off">
+        <span class="badge-key">ESC</span>
+      </div>
+      <div class="walker-results" id="walker-results">
+        <!-- Dynamically injected items -->
+      </div>
+      <div class="walker-footer">
+        <div class="walker-hints">
+          <span><kbd class="badge-key">↑↓</kbd> navigate</span>
+          <span><kbd class="badge-key">↵</kbd> select</span>
+          <span><kbd class="badge-key">Esc</kbd> close</span>
+        </div>
+        <div>Omarchy Web Shell v1.0</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
