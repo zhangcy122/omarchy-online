@@ -1,0 +1,358 @@
+/* Omarchy Online - Tokyo Night Design System */
+:root {
+  --bg-darker: #0e0e14;
+  --bg-dark: #13141c;
+  --bg: #1a1b26;
+  --bg-lighter: #24283b;
+  --bg-selection: #292e42;
+  --fg: #a9b1d6;
+  --fg-dark: #565f89;
+  --fg-bright: #c0caf5;
+  --accent: #7aa2f7;
+  --accent-bright: #7da6ff;
+  --red: #f7768e;
+  --green: #9ece6a;
+  --yellow: #e0af68;
+  --magenta: #bb9af7;
+  --cyan: #7dcfff;
+  --border: #414868;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --bar-height: 38px;
+  --font-mono: "JetBrains Mono", "Berkeley Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-darker);
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  user-select: none;
+}
+
+/* ============================================================
+   1. Omarchy Bar (Waybar / Quickshell Emulation)
+   ============================================================ */
+#omarchy-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--bar-height);
+  background: rgba(19, 20, 28, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.bar-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Left: Menu & Workspaces */
+.bar-button {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--fg);
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  transition: all 0.15s ease;
+}
+
+.bar-button:hover {
+  background: var(--bg-lighter);
+  border-color: var(--border);
+  color: var(--fg-bright);
+}
+
+.omarchy-logo-btn {
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+}
+
+.omarchy-logo-btn img {
+  height: 18px;
+  width: auto;
+  display: block;
+}
+
+.workspace-list {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(14, 14, 20, 0.6);
+  padding: 3px 6px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+}
+
+.ws-item {
+  width: 24px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--fg-dark);
+  transition: all 0.15s ease;
+}
+
+.ws-item:hover {
+  color: var(--fg-bright);
+  background: var(--bg-lighter);
+}
+
+.ws-item.active {
+  background: var(--accent);
+  color: var(--bg-darker);
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(122, 162, 247, 0.5);
+}
+
+/* Center: Clock & System Title */
+.bar-clock {
+  font-weight: 600;
+  color: var(--fg-bright);
+  letter-spacing: 0.5px;
+  padding: 4px 12px;
+  background: rgba(14, 14, 20, 0.5);
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clock-date {
+  color: var(--fg-dark);
+  font-weight: 400;
+  font-size: 11px;
+}
+
+/* Right: Agent Status & Controls */
+.agent-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(158, 206, 106, 0.12);
+  border: 1px solid rgba(158, 206, 106, 0.3);
+  color: var(--green);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--green);
+  animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 12px var(--green); }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+.badge-key {
+  background: var(--bg-lighter);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 10px;
+  color: var(--fg-bright);
+}
+
+/* ============================================================
+   2. Main Terminal Viewport Container
+   ============================================================ */
+#viewport-container {
+  position: absolute;
+  top: var(--bar-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg);
+}
+
+#terminal-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+  background: var(--bg);
+}
+
+/* ============================================================
+   3. Walker Launcher Modal (omarchy.menu / Walker Emulation)
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 15vh;
+  z-index: 2000;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.walker-window {
+  width: 580px;
+  max-width: 90vw;
+  background: var(--bg-dark);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 25px rgba(122, 162, 247, 0.25);
+  overflow: hidden;
+  animation: scaleIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.96) translateY(-10px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.walker-search-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(26, 27, 38, 0.7);
+}
+
+.walker-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+#walker-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--fg-bright);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+#walker-input::placeholder {
+  color: var(--fg-dark);
+}
+
+.walker-results {
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 10px 0;
+}
+
+.walker-category {
+  padding: 6px 18px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--fg-dark);
+}
+
+.walker-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  color: var(--fg);
+}
+
+.walker-item:hover, .walker-item.active {
+  background: var(--bg-selection);
+  color: var(--fg-bright);
+  border-left: 3px solid var(--accent);
+  padding-left: 17px;
+}
+
+.walker-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.walker-icon {
+  font-size: 16px;
+  width: 22px;
+  text-align: center;
+}
+
+.walker-label {
+  font-weight: 500;
+}
+
+.walker-sub {
+  font-size: 11px;
+  color: var(--fg-dark);
+}
+
+.walker-footer {
+  padding: 10px 20px;
+  border-top: 1px solid var(--border-subtle);
+  background: rgba(14, 14, 20, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--fg-dark);
+}
+
+.walker-hints {
+  display: flex;
+  gap: 12px;
+}
