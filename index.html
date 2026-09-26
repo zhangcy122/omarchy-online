@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Omarchy Online ~ Web Desktop</title>
+  <title>Omarchy ~ Arch Linux / Hyprland</title>
   <link rel="icon" type="image/png" href="assets/icon.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- 1. Omarchy Top Bar (Waybar / Quickshell Emulation) -->
+  <!-- 1. Omarchy Bar (Waybar / Quickshell Emulation) -->
   <header id="omarchy-bar">
     <div class="bar-section">
       <!-- Omarchy Menu Launcher Button -->
-      <button class="bar-button omarchy-logo-btn" id="omarchy-menu-btn" title="Launch Omarchy Menu (Alt + Space)">
+      <button class="bar-button omarchy-logo-btn" id="omarchy-menu-btn" title="Omarchy Menu (SUPER + SPACE)">
         <img src="assets/logo-white.svg" alt="Omarchy Logo">
       </button>
 
@@ -31,40 +31,60 @@
       </div>
     </div>
 
-    <!-- Center: Window Title & Clock -->
+    <!-- Center: Clock & Window Title -->
     <div class="bar-section">
       <div class="bar-clock" id="omarchy-clock">
         <span id="clock-date" class="clock-date">Sat Sep 26</span>
-        <span id="clock-time">15:30:00</span>
+        <span id="clock-time">15:40:00</span>
       </div>
     </div>
 
-    <!-- Right: Agent Status, Controls & Hotkey Hints -->
+    <!-- Right: Agent Status, Keybindings & Fullscreen -->
     <div class="bar-section">
-      <div class="agent-pill" id="agent-badge" title="AI Coding Agent: Active">
+      <div class="agent-pill" id="agent-badge" title="AI Agent Status: Active">
         <span class="pulse-dot"></span>
         <span>Hermes Agent</span>
       </div>
 
-      <button class="bar-button" id="fullscreen-btn" title="Toggle Fullscreen & Lock Keyboard">
-        <span>⛶</span>
+      <button class="badge-key" id="cheatsheet-btn" title="View Omarchy Keybindings (SUPER + K)">
+        SUPER + K
       </button>
 
-      <span class="badge-key" title="Launcher shortcut">Alt + Space</span>
+      <button class="bar-button" id="fullscreen-btn" title="Toggle Fullscreen (SUPER + F)">
+        <span>⛶</span>
+      </button>
     </div>
   </header>
 
-  <!-- 2. Main Terminal Tiling Viewport -->
-  <main id="viewport-container">
-    <iframe id="terminal-frame" src="/zellij/" allow="clipboard-read; clipboard-write; fullscreen"></iframe>
+  <!-- 2. Hyprland Desktop Area (Gaps & Window Border) -->
+  <main id="hypr-desktop">
+    <div class="hypr-window" id="hypr-window">
+      <!-- Hyprland Window Title Bar -->
+      <div class="window-titlebar">
+        <div class="window-title-left">
+          <span class="window-title-badge">terminal</span>
+          <span id="current-window-title">alacritty ~ user@omarchy:~ [workspace 1]</span>
+        </div>
+        <div class="window-controls">
+          <span class="win-dot min" id="win-min-btn" title="Toggle Floating (SUPER + T)"></span>
+          <span class="win-dot max" id="win-max-btn" title="Maximize Window (SUPER + F)"></span>
+          <span class="win-dot close" id="win-close-btn" title="Close Window (SUPER + W / Q)"></span>
+        </div>
+      </div>
+
+      <!-- Window Content (Zellij Web PTY Terminal) -->
+      <div class="window-body">
+        <iframe id="terminal-frame" src="/zellij/" allow="clipboard-read; clipboard-write; fullscreen"></iframe>
+      </div>
+    </div>
   </main>
 
-  <!-- 3. Walker Modal Launcher (omarchy.menu / Walker Emulation) -->
+  <!-- 3. Walker Application Launcher (SUPER + SPACE) -->
   <div class="modal-overlay" id="walker-modal">
     <div class="walker-window">
       <div class="walker-search-box">
         <img src="assets/icon.png" alt="Omarchy Icon" class="walker-logo">
-        <input type="text" id="walker-input" placeholder="Search commands, apps, agents, or workspaces..." autocomplete="off">
+        <input type="text" id="walker-input" placeholder="Search commands, applications, AI agents, or workspaces..." autocomplete="off">
         <span class="badge-key">ESC</span>
       </div>
       <div class="walker-results" id="walker-results">
@@ -76,10 +96,68 @@
           <span><kbd class="badge-key">↵</kbd> select</span>
           <span><kbd class="badge-key">Esc</kbd> close</span>
         </div>
-        <div>Omarchy Web Shell v1.0</div>
+        <div>Walker Menu ~ Omarchy</div>
       </div>
     </div>
   </div>
+
+  <!-- 4. Omarchy Official Keybindings Cheatsheet Modal (SUPER + K) -->
+  <div class="modal-overlay" id="keybindings-modal">
+    <div class="cheatsheet-window">
+      <div class="cheatsheet-header">
+        <div class="cheatsheet-title">
+          <img src="assets/icon.png" alt="Omarchy" style="height: 22px; width: auto;">
+          <span>Omarchy Official Keybindings Cheatsheet</span>
+        </div>
+        <span class="badge-key" id="close-cheatsheet-btn">ESC</span>
+      </div>
+      <div class="cheatsheet-body">
+        <!-- Tiling & Windows -->
+        <div class="key-group">
+          <div class="key-group-title">🪟 Windows & Tiling (Hyprland)</div>
+          <div class="key-row"><span class="key-desc">Close active window</span><kbd class="badge-key">SUPER + W / Q</kbd></div>
+          <div class="key-row"><span class="key-desc">Toggle window fullscreen</span><kbd class="badge-key">SUPER + F</kbd></div>
+          <div class="key-row"><span class="key-desc">Toggle window split</span><kbd class="badge-key">SUPER + J</kbd></div>
+          <div class="key-row"><span class="key-desc">Toggle floating/tiling</span><kbd class="badge-key">SUPER + T</kbd></div>
+          <div class="key-row"><span class="key-desc">Focus left/right/up/down</span><kbd class="badge-key">SUPER + Arrows</kbd></div>
+          <div class="key-row"><span class="key-desc">Cycle window focus</span><kbd class="badge-key">ALT + TAB</kbd></div>
+        </div>
+
+        <!-- Workspaces -->
+        <div class="key-group">
+          <div class="key-group-title">🔢 Workspaces</div>
+          <div class="key-row"><span class="key-desc">Switch to workspace 1..9</span><kbd class="badge-key">SUPER + 1..9</kbd></div>
+          <div class="key-row"><span class="key-desc">Next / Previous workspace</span><kbd class="badge-key">SUPER + TAB</kbd></div>
+          <div class="key-row"><span class="key-desc">Previous workspace</span><kbd class="badge-key">SUPER + SHIFT + TAB</kbd></div>
+          <div class="key-row"><span class="key-desc">Move window to workspace</span><kbd class="badge-key">SUPER + SHIFT + 1..9</kbd></div>
+        </div>
+
+        <!-- Applications -->
+        <div class="key-group">
+          <div class="key-group-title">🚀 Applications & Tools</div>
+          <div class="key-row"><span class="key-desc">Terminal (Alacritty / Ghostty)</span><kbd class="badge-key">SUPER + RETURN</kbd></div>
+          <div class="key-row"><span class="key-desc">Walker App Launcher</span><kbd class="badge-key">SUPER + SPACE</kbd></div>
+          <div class="key-row"><span class="key-desc">Neovim Editor</span><kbd class="badge-key">SUPER + SHIFT + N</kbd></div>
+          <div class="key-row"><span class="key-desc">ChatGPT / AI Companion</span><kbd class="badge-key">SUPER + SHIFT + A</kbd></div>
+          <div class="key-row"><span class="key-desc">Docker TUI Manager</span><kbd class="badge-key">SUPER + SHIFT + D</kbd></div>
+          <div class="key-row"><span class="key-desc">Browser (Brave / Chromium)</span><kbd class="badge-key">SUPER + SHIFT + RETURN</kbd></div>
+        </div>
+
+        <!-- System & Appearance -->
+        <div class="key-group">
+          <div class="key-group-title">🎨 Appearance & System</div>
+          <div class="key-row"><span class="key-desc">Keybindings Cheatsheet</span><kbd class="badge-key">SUPER + K</kbd></div>
+          <div class="key-row"><span class="key-desc">Toggle top bar (Waybar)</span><kbd class="badge-key">SUPER + SHIFT + SPACE</kbd></div>
+          <div class="key-row"><span class="key-desc">Switch background wallpaper</span><kbd class="badge-key">SUPER + CTRL + SPACE</kbd></div>
+          <div class="key-row"><span class="key-desc">Theme menu (Tokyo Night / ...)</span><kbd class="badge-key">SUPER + SHIFT + CTRL + SPACE</kbd></div>
+          <div class="key-row"><span class="key-desc">Lock system / Screen</span><kbd class="badge-key">SUPER + ESCAPE</kbd></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast"></div>
 
   <script src="app.js"></script>
 </body>
