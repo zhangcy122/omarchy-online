@@ -7,7 +7,7 @@
 }
 
 :8443 {
-	tls config/caddy/cert.pem config/caddy/key.pem
+	tls /home/ubuntu/Projects/omarchy-online/config/caddy/cert.pem /home/ubuntu/Projects/omarchy-online/config/caddy/key.pem
 
 	# Security Headers
 	header {
@@ -28,7 +28,7 @@
 
 	# 2. Serve Omarchy Web Shell Frontend
 	handle {
-		root * ./web
+		root * /home/ubuntu/Projects/omarchy-online/web
 		file_server
 		try_files {path} /index.html
 	}
