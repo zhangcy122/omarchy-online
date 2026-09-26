@@ -1,4 +1,4 @@
-/* Omarchy Online - Tokyo Night Design System */
+/* Omarchy Online - Tokyo Night Design System (1:1 Official Omarchy Alignment) */
 :root {
   --bg-darker: #0e0e14;
   --bg-dark: #13141c;
@@ -16,8 +16,10 @@
   --magenta: #bb9af7;
   --cyan: #7dcfff;
   --border: #414868;
+  --border-active: #7aa2f7;
   --border-subtle: rgba(255, 255, 255, 0.08);
   --bar-height: 38px;
+  --gaps-out: 10px;
   --font-mono: "JetBrains Mono", "Berkeley Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
@@ -33,10 +35,15 @@ body, html {
   height: 100%;
   overflow: hidden;
   background-color: var(--bg-darker);
+  background-image: url('assets/backgrounds/0-winding-road.webp');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
   color: var(--fg);
   font-family: var(--font-mono);
   font-size: 13px;
   user-select: none;
+  transition: background-image 0.3s ease-in-out;
 }
 
 /* ============================================================
@@ -49,15 +56,20 @@ body, html {
   right: 0;
   height: var(--bar-height);
   background: rgba(19, 20, 28, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 12px;
   z-index: 1000;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#omarchy-bar.hidden {
+  transform: translateY(-100%);
 }
 
 .bar-section {
@@ -135,7 +147,7 @@ body, html {
   box-shadow: 0 0 10px rgba(122, 162, 247, 0.5);
 }
 
-/* Center: Clock & System Title */
+/* Center: Clock & Window Title */
 .bar-clock {
   font-weight: 600;
   color: var(--fg-bright);
@@ -188,21 +200,114 @@ body, html {
   background: var(--bg-lighter);
   border: 1px solid var(--border);
   border-radius: 4px;
-  padding: 1px 5px;
+  padding: 2px 6px;
   font-size: 10px;
   color: var(--fg-bright);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.badge-key:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 /* ============================================================
-   2. Main Terminal Viewport Container
+   2. Hyprland Desktop & Gaps Layout (looknfeel.lua Gaps & Borders)
    ============================================================ */
-#viewport-container {
+#hypr-desktop {
   position: absolute;
   top: var(--bar-height);
   left: 0;
   right: 0;
   bottom: 0;
+  padding: var(--gaps-out);
+  display: flex;
+  flex-direction: column;
+  transition: top 0.25s cubic-bezier(0.16, 1, 0.3, 1), padding 0.2s ease;
+}
+
+body.bar-hidden #hypr-desktop {
+  top: 0;
+}
+
+.hypr-window {
+  flex: 1;
+  width: 100%;
+  height: 100%;
   background: var(--bg);
+  border: 2px solid var(--border-active);
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 15px rgba(122, 162, 247, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  transition: border-color 0.2s ease;
+}
+
+.hypr-window.maximized {
+  border-radius: 0;
+  border-width: 0;
+  box-shadow: none;
+}
+
+body.maximized-mode #hypr-desktop {
+  padding: 0;
+}
+
+.window-titlebar {
+  height: 28px;
+  background: var(--bg-dark);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+.window-title-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--fg-bright);
+}
+
+.window-title-badge {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.window-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.win-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: inline-block;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+}
+
+.win-dot:hover {
+  opacity: 1;
+}
+
+.win-dot.close { background: var(--red); }
+.win-dot.min { background: var(--yellow); }
+.win-dot.max { background: var(--green); }
+
+.window-body {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
 #terminal-frame {
@@ -214,7 +319,7 @@ body, html {
 }
 
 /* ============================================================
-   3. Walker Launcher Modal (omarchy.menu / Walker Emulation)
+   3. Walker Launcher Modal (SUPER + SPACE)
    ============================================================ */
 .modal-overlay {
   position: fixed;
@@ -243,12 +348,12 @@ body, html {
 }
 
 .walker-window {
-  width: 580px;
+  width: 600px;
   max-width: 90vw;
   background: var(--bg-dark);
-  border: 1px solid var(--accent);
+  border: 2px solid var(--accent);
   border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 25px rgba(122, 162, 247, 0.25);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(122, 162, 247, 0.35);
   overflow: hidden;
   animation: scaleIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -289,13 +394,13 @@ body, html {
 }
 
 .walker-results {
-  max-height: 380px;
+  max-height: 400px;
   overflow-y: auto;
   padding: 10px 0;
 }
 
 .walker-category {
-  padding: 6px 18px;
+  padding: 8px 20px 4px 20px;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -344,7 +449,7 @@ body, html {
 .walker-footer {
   padding: 10px 20px;
   border-top: 1px solid var(--border-subtle);
-  background: rgba(14, 14, 20, 0.8);
+  background: rgba(14, 14, 20, 0.85);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -355,4 +460,95 @@ body, html {
 .walker-hints {
   display: flex;
   gap: 12px;
+}
+
+/* ============================================================
+   4. Omarchy Keybindings Cheatsheet Modal (SUPER + K)
+   ============================================================ */
+.cheatsheet-window {
+  width: 800px;
+  max-width: 94vw;
+  max-height: 80vh;
+  background: var(--bg-dark);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(122, 162, 247, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: scaleIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cheatsheet-header {
+  padding: 16px 24px;
+  background: rgba(26, 27, 38, 0.85);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cheatsheet-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--fg-bright);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cheatsheet-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+.key-group-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent);
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 4px;
+}
+
+.key-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.key-desc {
+  color: var(--fg);
+  font-size: 12px;
+}
+
+/* Toast notification */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--bg-dark);
+  border: 1px solid var(--accent);
+  color: var(--fg-bright);
+  padding: 10px 18px;
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  z-index: 3000;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  font-size: 12px;
+}
+
+#toast.show {
+  opacity: 1;
+  transform: translateY(0);
 }
