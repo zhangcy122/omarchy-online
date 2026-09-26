@@ -1,27 +1,35 @@
 # Omarchy Online - Caddy Gateway Configuration
-# Reverse Proxy to Zellij Web Client with TLS Termination
+# Reverse Proxy to Zellij Web Client with TLS Termination & Web Shell
 
 {
 	admin 127.0.0.1:2020
 	auto_https disable_redirects
 }
 
-# Default port :8443 with TLS certificate (or change to your domain for auto Let's Encrypt)
-# For domain deployment: replace ':8443' with 'vps.yourdomain.com' and remove 'tls ...'
 :8443 {
-	tls /home/ubuntu/Projects/omarchy-online/config/caddy/cert.pem /home/ubuntu/Projects/omarchy-online/config/caddy/key.pem
+	tls config/caddy/cert.pem config/caddy/key.pem
 
 	# Security Headers
 	header {
 		Strict-Transport-Security "max-age=31536000;"
 		X-Content-Type-Options "nosniff"
-		X-Frame-Options "SAMEORIGIN"
 		Referrer-Policy "strict-origin-when-cross-origin"
 	}
 
-	# Reverse proxy to Zellij Web server (supports WebSockets natively)
-	reverse_proxy 127.0.0.1:8082 {
-		header_up Host {upstream_hostport}
-		header_up X-Real-IP {remote_host}
+	# 1. Reverse proxy to Zellij Web server under /zellij/
+	handle_path /zellij* {
+		reverse_proxy 127.0.0.1:8082 {
+			header_up Host {upstream_hostport}
+			header_up X-Real-IP {remote_host}
+			header_down -X-Frame-Options
+			header_down X-Frame-Options "SAMEORIGIN"
+		}
+	}
+
+	# 2. Serve Omarchy Web Shell Frontend
+	handle {
+		root * ./web
+		file_server
+		try_files {path} /index.html
 	}
 }
