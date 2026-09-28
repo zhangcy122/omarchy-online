@@ -132,6 +132,7 @@ body, html {
   cursor: pointer;
   font-weight: 600;
   color: var(--fg-dark);
+  position: relative;
   transition: all 0.15s ease;
 }
 
@@ -145,6 +146,21 @@ body, html {
   color: var(--bg-darker);
   font-weight: 700;
   box-shadow: 0 0 10px rgba(122, 162, 247, 0.5);
+}
+
+.ws-item.has-windows::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--fg-dark);
+  transition: background 0.15s ease;
+}
+
+.ws-item.active.has-windows::after {
+  background: var(--bg-darker);
 }
 
 /* Center: Clock & Window Title */
@@ -221,39 +237,98 @@ body, html {
   left: 0;
   right: 0;
   bottom: 0;
-  padding: var(--gaps-out);
-  display: flex;
-  flex-direction: column;
-  transition: top 0.25s cubic-bezier(0.16, 1, 0.3, 1), padding 0.2s ease;
+  overflow: hidden;
+  transition: top 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 body.bar-hidden #hypr-desktop {
   top: 0;
 }
 
+.empty-desktop-watermark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  pointer-events: none;
+  opacity: 0.35;
+  transition: opacity 0.2s ease;
+  user-select: none;
+}
+
+.empty-desktop-watermark.hidden {
+  opacity: 0;
+  pointer-events: none;
+  display: none;
+}
+
+.watermark-logo {
+  height: 80px;
+  width: auto;
+  filter: drop-shadow(0 0 25px rgba(122, 162, 247, 0.3));
+}
+
+.watermark-hint {
+  font-size: 13px;
+  color: var(--fg);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.windows-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: auto;
+}
+
 .hypr-window {
-  flex: 1;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  box-sizing: border-box;
   background: var(--bg);
-  border: 2px solid var(--border-active);
+  border: 2px solid var(--border);
   border-radius: 8px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 15px rgba(122, 162, 247, 0.25);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  position: relative;
-  transition: border-color 0.2s ease;
+  transition: left 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              top 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              width 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              height 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.15s ease,
+              box-shadow 0.15s ease;
+  z-index: 10;
 }
 
-.hypr-window.maximized {
-  border-radius: 0;
-  border-width: 0;
-  box-shadow: none;
+.hypr-window.active {
+  border-color: var(--border-active);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75), 0 0 20px rgba(122, 162, 247, 0.35);
+  z-index: 20;
 }
 
-body.maximized-mode #hypr-desktop {
-  padding: 0;
+.hypr-window.floating {
+  z-index: 30;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(187, 154, 247, 0.4);
+}
+
+.hypr-window.fullscreen {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  border-width: 0 !important;
+  z-index: 50 !important;
 }
 
 .window-titlebar {
@@ -265,6 +340,9 @@ body.maximized-mode #hypr-desktop {
   justify-content: space-between;
   padding: 0 10px;
   font-size: 11px;
+  cursor: grab;
+  user-select: none;
+  flex-shrink: 0;
 }
 
 .window-title-left {
@@ -272,17 +350,24 @@ body.maximized-mode #hypr-desktop {
   align-items: center;
   gap: 8px;
   color: var(--fg-bright);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .window-title-badge {
   color: var(--accent);
   font-weight: 700;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.5px;
 }
 
 .window-controls {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .win-dot {
@@ -292,11 +377,12 @@ body.maximized-mode #hypr-desktop {
   display: inline-block;
   cursor: pointer;
   opacity: 0.85;
-  transition: opacity 0.15s ease;
+  transition: opacity 0.15s ease, transform 0.1s ease;
 }
 
 .win-dot:hover {
   opacity: 1;
+  transform: scale(1.15);
 }
 
 .win-dot.close { background: var(--red); }
@@ -308,9 +394,10 @@ body.maximized-mode #hypr-desktop {
   width: 100%;
   height: 100%;
   position: relative;
+  overflow: hidden;
 }
 
-#terminal-frame {
+.terminal-frame {
   width: 100%;
   height: 100%;
   border: none;
