@@ -103,6 +103,13 @@ function spawnWindow(wsId = currentWorkspace, options = {}) {
     focusWindow(winId);
   });
 
+  const iframeEl = winEl.querySelector('iframe');
+  iframeEl?.addEventListener('load', () => {
+    try {
+      iframeEl.contentWindow?.addEventListener('keydown', handleHyprlandKeydown);
+    } catch (err) {}
+  });
+
   const closeBtn = winEl.querySelector('.win-dot.close');
   closeBtn?.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -729,151 +736,153 @@ function initKeybindingsCheatsheet() {
 // ============================================================
 
 function initHyprlandKeybindings() {
-  window.addEventListener('keydown', (e) => {
-    // Check if SUPER (Meta) OR ALT (Option fallback) is pressed
-    const isSuper = e.metaKey || e.altKey;
+  window.addEventListener('keydown', handleHyprlandKeydown);
+}
 
-    // ALT + TAB: Cycle window focus within current workspace
-    if (e.altKey && e.code === 'Tab') {
-      e.preventDefault();
-      cycleFocus(e.shiftKey ? -1 : 1);
-      return;
-    }
+function handleHyprlandKeydown(e) {
+  // Check if SUPER (Meta) OR ALT (Option fallback) is pressed
+  const isSuper = e.metaKey || e.altKey;
 
-    if (!isSuper) return;
+  // ALT + TAB: Cycle window focus within current workspace
+  if (e.altKey && e.code === 'Tab') {
+    e.preventDefault();
+    cycleFocus(e.shiftKey ? -1 : 1);
+    return;
+  }
 
-    // 1. SUPER + SPACE: Walker Launcher
-    if (e.code === 'Space' && !e.shiftKey && !e.ctrlKey) {
-      e.preventDefault();
-      window.toggleWalker?.();
-      return;
-    }
+  if (!isSuper) return;
 
-    // 2. SUPER + K: Keybindings Cheatsheet
-    if (e.code === 'KeyK' && !e.shiftKey && !e.ctrlKey) {
-      e.preventDefault();
-      window.toggleKeybindingsCheatsheet?.();
-      return;
-    }
+  // 1. SUPER + SPACE: Walker Launcher
+  if (e.code === 'Space' && !e.shiftKey && !e.ctrlKey) {
+    e.preventDefault();
+    window.toggleWalker?.();
+    return;
+  }
 
-    // 3. SUPER + SHIFT + SPACE: Toggle Top Bar
-    if (e.code === 'Space' && e.shiftKey && !e.ctrlKey) {
-      e.preventDefault();
-      toggleTopBar();
-      return;
-    }
+  // 2. SUPER + K: Keybindings Cheatsheet
+  if (e.code === 'KeyK' && !e.shiftKey && !e.ctrlKey) {
+    e.preventDefault();
+    window.toggleKeybindingsCheatsheet?.();
+    return;
+  }
 
-    // 4. SUPER + CTRL + SPACE: Cycle Wallpaper
-    if (e.code === 'Space' && !e.shiftKey && e.ctrlKey) {
-      e.preventDefault();
-      switchWallpaper();
-      return;
-    }
+  // 3. SUPER + SHIFT + SPACE: Toggle Top Bar
+  if (e.code === 'Space' && e.shiftKey && !e.ctrlKey) {
+    e.preventDefault();
+    toggleTopBar();
+    return;
+  }
 
-    // 5. SUPER + SHIFT + CTRL + SPACE: Toggle Theme
-    if (e.code === 'Space' && e.shiftKey && e.ctrlKey) {
-      e.preventDefault();
-      toggleTheme();
-      return;
-    }
+  // 4. SUPER + CTRL + SPACE: Cycle Wallpaper
+  if (e.code === 'Space' && !e.shiftKey && e.ctrlKey) {
+    e.preventDefault();
+    switchWallpaper();
+    return;
+  }
 
-    // 6. SUPER + F: Fullscreen focused window
-    if (e.code === 'KeyF' && !e.shiftKey && !e.ctrlKey) {
-      e.preventDefault();
-      toggleWindowFullscreen();
-      return;
-    }
+  // 5. SUPER + SHIFT + CTRL + SPACE: Toggle Theme
+  if (e.code === 'Space' && e.shiftKey && e.ctrlKey) {
+    e.preventDefault();
+    toggleTheme();
+    return;
+  }
 
-    // 7. SUPER + T: Toggle floating mode
-    if (e.code === 'KeyT' && !e.shiftKey && !e.ctrlKey) {
-      e.preventDefault();
-      toggleFloating();
-      return;
-    }
+  // 6. SUPER + F: Fullscreen focused window
+  if (e.code === 'KeyF' && !e.shiftKey && !e.ctrlKey) {
+    e.preventDefault();
+    toggleWindowFullscreen();
+    return;
+  }
 
-    // 8. SUPER + J: Toggle Dwindle split direction (horizontal/vertical)
-    if (e.code === 'KeyJ' && !e.shiftKey && !e.ctrlKey) {
-      e.preventDefault();
-      toggleSplitDirection();
-      return;
-    }
+  // 7. SUPER + T: Toggle floating mode
+  if (e.code === 'KeyT' && !e.shiftKey && !e.ctrlKey) {
+    e.preventDefault();
+    toggleFloating();
+    return;
+  }
 
-    // 9. SUPER + W or SUPER + Q: Close focused window
-    if ((e.code === 'KeyW' || e.code === 'KeyQ') && !e.shiftKey && !e.ctrlKey) {
-      e.preventDefault();
-      closeWindow(workspaces[currentWorkspace]?.focusedId);
-      return;
-    }
+  // 8. SUPER + J: Toggle Dwindle split direction (horizontal/vertical)
+  if (e.code === 'KeyJ' && !e.shiftKey && !e.ctrlKey) {
+    e.preventDefault();
+    toggleSplitDirection();
+    return;
+  }
 
-    // 10. SUPER + RETURN: Spawn new terminal window
-    if (e.code === 'Enter' && !e.shiftKey && !e.ctrlKey) {
-      e.preventDefault();
-      spawnWindow(currentWorkspace);
-      return;
-    }
+  // 9. SUPER + W or SUPER + Q: Close focused window
+  if ((e.code === 'KeyW' || e.code === 'KeyQ') && !e.shiftKey && !e.ctrlKey) {
+    e.preventDefault();
+    closeWindow(workspaces[currentWorkspace]?.focusedId);
+    return;
+  }
 
-    // 11. SUPER + Arrow Keys: Focus window by direction
-    if (e.code === 'ArrowLeft' && !e.shiftKey) {
-      e.preventDefault();
-      focusAdjacentWindow('left');
-      return;
-    }
-    if (e.code === 'ArrowRight' && !e.shiftKey) {
-      e.preventDefault();
-      focusAdjacentWindow('right');
-      return;
-    }
-    if (e.code === 'ArrowUp' && !e.shiftKey) {
-      e.preventDefault();
-      focusAdjacentWindow('up');
-      return;
-    }
-    if (e.code === 'ArrowDown' && !e.shiftKey) {
-      e.preventDefault();
-      focusAdjacentWindow('down');
-      return;
-    }
+  // 10. SUPER + RETURN: Spawn new terminal window
+  if (e.code === 'Enter' && !e.shiftKey && !e.ctrlKey) {
+    e.preventDefault();
+    spawnWindow(currentWorkspace);
+    return;
+  }
 
-    // 12. SUPER + 1..9: Switch workspace / SUPER + SHIFT + 1..9: Move window
-    if (e.code.startsWith('Digit') && !e.ctrlKey) {
-      const num = parseInt(e.code.replace('Digit', ''), 10);
-      if (num >= 1 && num <= 9) {
-        e.preventDefault();
-        if (e.shiftKey) {
-          moveFocusedWindowToWorkspace(num);
-        } else {
-          switchWorkspace(num);
-        }
-        return;
-      }
-    }
+  // 11. SUPER + Arrow Keys: Focus window by direction
+  if (e.code === 'ArrowLeft' && !e.shiftKey) {
+    e.preventDefault();
+    focusAdjacentWindow('left');
+    return;
+  }
+  if (e.code === 'ArrowRight' && !e.shiftKey) {
+    e.preventDefault();
+    focusAdjacentWindow('right');
+    return;
+  }
+  if (e.code === 'ArrowUp' && !e.shiftKey) {
+    e.preventDefault();
+    focusAdjacentWindow('up');
+    return;
+  }
+  if (e.code === 'ArrowDown' && !e.shiftKey) {
+    e.preventDefault();
+    focusAdjacentWindow('down');
+    return;
+  }
 
-    // 13. SUPER + TAB: Next workspace / SUPER + SHIFT + TAB: Prev workspace
-    if (e.code === 'Tab') {
+  // 12. SUPER + 1..9: Switch workspace / SUPER + SHIFT + 1..9: Move window
+  if (e.code.startsWith('Digit') && !e.ctrlKey) {
+    const num = parseInt(e.code.replace('Digit', ''), 10);
+    if (num >= 1 && num <= 9) {
       e.preventDefault();
       if (e.shiftKey) {
-        prevWorkspace();
+        moveFocusedWindowToWorkspace(num);
       } else {
-        nextWorkspace();
+        switchWorkspace(num);
       }
       return;
     }
+  }
 
-    // 14. SUPER + SHIFT + A: ChatGPT / AI
-    if (e.code === 'KeyA' && e.shiftKey) {
-      e.preventDefault();
-      window.open('https://chatgpt.com', '_blank');
-      showToast('Opening ChatGPT web app...');
-      return;
+  // 13. SUPER + TAB: Next workspace / SUPER + SHIFT + TAB: Prev workspace
+  if (e.code === 'Tab') {
+    e.preventDefault();
+    if (e.shiftKey) {
+      prevWorkspace();
+    } else {
+      nextWorkspace();
     }
+    return;
+  }
 
-    // 15. SUPER + SHIFT + N: Neovim
-    if (e.code === 'KeyN' && e.shiftKey) {
-      e.preventDefault();
-      spawnWindow(currentWorkspace, { type: 'editor', title: 'nvim ~ omarchy-config' });
-      return;
-    }
-  });
+  // 14. SUPER + SHIFT + A: ChatGPT / AI
+  if (e.code === 'KeyA' && e.shiftKey) {
+    e.preventDefault();
+    window.open('https://chatgpt.com', '_blank');
+    showToast('Opening ChatGPT web app...');
+    return;
+  }
+
+  // 15. SUPER + SHIFT + N: Neovim
+  if (e.code === 'KeyN' && e.shiftKey) {
+    e.preventDefault();
+    spawnWindow(currentWorkspace, { type: 'editor', title: 'nvim ~ omarchy-config' });
+    return;
+  }
 }
 
 // ============================================================
