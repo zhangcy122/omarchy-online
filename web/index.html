@@ -58,25 +58,14 @@
 
   <!-- 2. Hyprland Desktop Area (Gaps & Window Border) -->
   <main id="hypr-desktop">
-    <div class="hypr-window" id="hypr-window">
-      <!-- Hyprland Window Title Bar -->
-      <div class="window-titlebar">
-        <div class="window-title-left">
-          <span class="window-title-badge">terminal</span>
-          <span id="current-window-title">alacritty ~ user@omarchy:~ [workspace 1]</span>
-        </div>
-        <div class="window-controls">
-          <span class="win-dot min" id="win-min-btn" title="Toggle Floating (SUPER + T)"></span>
-          <span class="win-dot max" id="win-max-btn" title="Maximize Window (SUPER + F)"></span>
-          <span class="win-dot close" id="win-close-btn" title="Close Window (SUPER + W / Q)"></span>
-        </div>
-      </div>
-
-      <!-- Window Content (Zellij Web PTY Terminal) -->
-      <div class="window-body">
-        <iframe id="terminal-frame" src="/zellij/" allow="clipboard-read; clipboard-write; fullscreen"></iframe>
-      </div>
+    <!-- Empty Desktop Watermark (Visible when no windows open in workspace) -->
+    <div id="empty-desktop-watermark" class="empty-desktop-watermark">
+      <img src="assets/logo-white.svg" alt="Omarchy" class="watermark-logo">
+      <div class="watermark-hint"><kbd class="badge-key">SUPER + RETURN</kbd> to launch terminal &bull; <kbd class="badge-key">SUPER + SPACE</kbd> for Walker</div>
     </div>
+
+    <!-- Dynamic Window Container managed by Dwindle Layout Engine -->
+    <div id="windows-container" class="windows-container"></div>
   </main>
 
   <!-- 3. Walker Application Launcher (SUPER + SPACE) -->
@@ -159,6 +148,7 @@
   <!-- Notification Toast -->
   <div id="toast"></div>
 
+  <script src="dwindle.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
