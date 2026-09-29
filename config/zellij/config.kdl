@@ -1,0 +1,45 @@
+// Omarchy Online - Zellij Configuration
+// Theme: Tokyo Night (Omarchy Signature) & Catppuccin Mocha
+
+theme "tokyo-night"
+
+themes {
+    tokyo-night {
+        fg "#c0caf5"
+        bg "#1a1b26"
+        black "#15161e"
+        red "#f7768e"
+        green "#9ece6a"
+        yellow "#e0af68"
+        blue "#7aa2f7"
+        magenta "#bb9af7"
+        cyan "#7dcfff"
+        white "#a9b1d6"
+        orange "#ff9e64"
+    }
+    catppuccin-mocha {
+        fg "#cdd6f4"
+        bg "#1e1e2e"
+        black "#45475a"
+        red "#f38ba8"
+        green "#a6e3a1"
+        yellow "#f9e2af"
+        blue "#89b4fa"
+        magenta "#cba6f7"
+        cyan "#94e2d5"
+        white "#bac2de"
+        orange "#fab387"
+    }
+}
+
+// UI Options
+mouse_mode true
+copy_on_select true
+pane_frames true
+auto_layout true
+
+// Simplified UI off to preserve rich status bar and tabs
+simplified_ui false
+
+// Default shell
+default_shell "bash"

@@ -1,0 +1,4 @@
+.caw/
+config/caddy/*.pem
+*.log
+*.pid

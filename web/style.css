@@ -1,0 +1,641 @@
+/* Omarchy Online - Tokyo Night Design System (1:1 Official Omarchy Alignment) */
+:root {
+  --bg-darker: #0e0e14;
+  --bg-dark: #13141c;
+  --bg: #1a1b26;
+  --bg-lighter: #24283b;
+  --bg-selection: #292e42;
+  --fg: #a9b1d6;
+  --fg-dark: #565f89;
+  --fg-bright: #c0caf5;
+  --accent: #7aa2f7;
+  --accent-bright: #7da6ff;
+  --red: #f7768e;
+  --green: #9ece6a;
+  --yellow: #e0af68;
+  --magenta: #bb9af7;
+  --cyan: #7dcfff;
+  --border: #414868;
+  --border-active: #7aa2f7;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --bar-height: 38px;
+  --gaps-out: 10px;
+  --font-mono: "JetBrains Mono", "Berkeley Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-darker);
+  background-image: url('assets/backgrounds/0-winding-road.webp');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  user-select: none;
+  transition: background-image 0.3s ease-in-out;
+}
+
+/* ============================================================
+   1. Omarchy Bar (Waybar / Quickshell Emulation)
+   ============================================================ */
+#omarchy-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--bar-height);
+  background: rgba(19, 20, 28, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#omarchy-bar.hidden {
+  transform: translateY(-100%);
+}
+
+.bar-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Left: Menu & Workspaces */
+.bar-button {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--fg);
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  transition: all 0.15s ease;
+}
+
+.bar-button:hover {
+  background: var(--bg-lighter);
+  border-color: var(--border);
+  color: var(--fg-bright);
+}
+
+.omarchy-logo-btn {
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+}
+
+.omarchy-logo-btn img {
+  height: 18px;
+  width: auto;
+  display: block;
+}
+
+.workspace-list {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(14, 14, 20, 0.6);
+  padding: 3px 6px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+}
+
+.ws-item {
+  width: 24px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--fg-dark);
+  position: relative;
+  transition: all 0.15s ease;
+}
+
+.ws-item:hover {
+  color: var(--fg-bright);
+  background: var(--bg-lighter);
+}
+
+.ws-item.active {
+  background: var(--accent);
+  color: var(--bg-darker);
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(122, 162, 247, 0.5);
+}
+
+.ws-item.has-windows::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--fg-dark);
+  transition: background 0.15s ease;
+}
+
+.ws-item.active.has-windows::after {
+  background: var(--bg-darker);
+}
+
+/* Center: Clock & Window Title */
+.bar-clock {
+  font-weight: 600;
+  color: var(--fg-bright);
+  letter-spacing: 0.5px;
+  padding: 4px 12px;
+  background: rgba(14, 14, 20, 0.5);
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clock-date {
+  color: var(--fg-dark);
+  font-weight: 400;
+  font-size: 11px;
+}
+
+/* Right: Agent Status & Controls */
+.agent-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(158, 206, 106, 0.12);
+  border: 1px solid rgba(158, 206, 106, 0.3);
+  color: var(--green);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--green);
+  animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 12px var(--green); }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+.badge-key {
+  background: var(--bg-lighter);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 10px;
+  color: var(--fg-bright);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.badge-key:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ============================================================
+   2. Hyprland Desktop & Gaps Layout (looknfeel.lua Gaps & Borders)
+   ============================================================ */
+#hypr-desktop {
+  position: absolute;
+  top: var(--bar-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  transition: top 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.bar-hidden #hypr-desktop {
+  top: 0;
+}
+
+.empty-desktop-watermark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  pointer-events: none;
+  opacity: 0.35;
+  transition: opacity 0.2s ease;
+  user-select: none;
+}
+
+.empty-desktop-watermark.hidden {
+  opacity: 0;
+  pointer-events: none;
+  display: none;
+}
+
+.watermark-logo {
+  height: 80px;
+  width: auto;
+  filter: drop-shadow(0 0 25px rgba(122, 162, 247, 0.3));
+}
+
+.watermark-hint {
+  font-size: 13px;
+  color: var(--fg);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.windows-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: auto;
+}
+
+.hypr-window {
+  position: absolute;
+  box-sizing: border-box;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: left 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              top 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              width 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              height 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.15s ease,
+              box-shadow 0.15s ease;
+  z-index: 10;
+}
+
+.hypr-window.active {
+  border-color: var(--border-active);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75), 0 0 20px rgba(122, 162, 247, 0.35);
+  z-index: 20;
+}
+
+.hypr-window.floating {
+  z-index: 30;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(187, 154, 247, 0.4);
+}
+
+.hypr-window.fullscreen {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  border-width: 0 !important;
+  z-index: 50 !important;
+}
+
+.window-titlebar {
+  height: 28px;
+  background: var(--bg-dark);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  font-size: 11px;
+  cursor: grab;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.window-title-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--fg-bright);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.window-title-badge {
+  color: var(--accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+
+.window-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.win-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: inline-block;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+}
+
+.win-dot:hover {
+  opacity: 1;
+  transform: scale(1.15);
+}
+
+.win-dot.close { background: var(--red); }
+.win-dot.min { background: var(--yellow); }
+.win-dot.max { background: var(--green); }
+
+.window-body {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.terminal-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+  background: var(--bg);
+}
+
+/* ============================================================
+   3. Walker Launcher Modal (SUPER + SPACE)
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 15vh;
+  z-index: 2000;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.walker-window {
+  width: 600px;
+  max-width: 90vw;
+  background: var(--bg-dark);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(122, 162, 247, 0.35);
+  overflow: hidden;
+  animation: scaleIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.96) translateY(-10px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.walker-search-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(26, 27, 38, 0.7);
+}
+
+.walker-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+#walker-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--fg-bright);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+#walker-input::placeholder {
+  color: var(--fg-dark);
+}
+
+.walker-results {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px 0;
+}
+
+.walker-category {
+  padding: 8px 20px 4px 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--fg-dark);
+}
+
+.walker-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  color: var(--fg);
+}
+
+.walker-item:hover, .walker-item.active {
+  background: var(--bg-selection);
+  color: var(--fg-bright);
+  border-left: 3px solid var(--accent);
+  padding-left: 17px;
+}
+
+.walker-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.walker-icon {
+  font-size: 16px;
+  width: 22px;
+  text-align: center;
+}
+
+.walker-label {
+  font-weight: 500;
+}
+
+.walker-sub {
+  font-size: 11px;
+  color: var(--fg-dark);
+}
+
+.walker-footer {
+  padding: 10px 20px;
+  border-top: 1px solid var(--border-subtle);
+  background: rgba(14, 14, 20, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--fg-dark);
+}
+
+.walker-hints {
+  display: flex;
+  gap: 12px;
+}
+
+/* ============================================================
+   4. Omarchy Keybindings Cheatsheet Modal (SUPER + K)
+   ============================================================ */
+.cheatsheet-window {
+  width: 800px;
+  max-width: 94vw;
+  max-height: 80vh;
+  background: var(--bg-dark);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(122, 162, 247, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: scaleIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cheatsheet-header {
+  padding: 16px 24px;
+  background: rgba(26, 27, 38, 0.85);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cheatsheet-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--fg-bright);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cheatsheet-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+.key-group-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent);
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 4px;
+}
+
+.key-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.key-desc {
+  color: var(--fg);
+  font-size: 12px;
+}
+
+/* Toast notification */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--bg-dark);
+  border: 1px solid var(--accent);
+  color: var(--fg-bright);
+  padding: 10px 18px;
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  z-index: 3000;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  font-size: 12px;
+}
+
+#toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
