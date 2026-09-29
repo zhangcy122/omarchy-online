@@ -971,6 +971,46 @@ function initControls() {
 
   const quickTermBtn = document.getElementById('quick-term-btn');
   quickTermBtn?.addEventListener('click', () => spawnWindow(currentWorkspace));
+
+  // Language switcher in topbar
+  const langToggleBtn = document.getElementById('lang-toggle-btn');
+  const langToggleText = document.getElementById('lang-toggle-text');
+
+  let currentDesktopLang = 'en';
+  try {
+    currentDesktopLang = localStorage.getItem('omarchy_lang') || 'en';
+  } catch (e) {}
+
+  function updateDesktopLang(lang, broadcast = true) {
+    currentDesktopLang = lang;
+    try {
+      localStorage.setItem('omarchy_lang', lang);
+    } catch (e) {}
+    if (langToggleText) {
+      langToggleText.textContent = lang === 'en' ? 'ZH' : 'EN';
+    }
+    if (broadcast) {
+      document.querySelectorAll('iframe').forEach(iframe => {
+        try {
+          iframe.contentWindow?.postMessage({ type: 'omarchy-set-lang', lang }, '*');
+        } catch (e) {}
+      });
+    }
+  }
+
+  updateDesktopLang(currentDesktopLang, false);
+
+  langToggleBtn?.addEventListener('click', () => {
+    const nextLang = currentDesktopLang === 'en' ? 'zh' : 'en';
+    updateDesktopLang(nextLang, true);
+    showToast(nextLang === 'en' ? 'Language: English' : '已切换为中文界面');
+  });
+
+  window.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'omarchy-lang-change') {
+      updateDesktopLang(event.data.lang, false);
+    }
+  });
 }
 
 async function toggleBrowserFullscreen() {

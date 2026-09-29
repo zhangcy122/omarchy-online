@@ -115,8 +115,29 @@
       gap: 8px;
     }
 
-    .github-link-btn {
+    .lang-switch-btn {
       background: var(--bg-lighter);
+      border: 1px solid var(--border);
+      color: var(--fg-bright);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .lang-switch-btn:hover {
+      background: var(--accent);
+      color: var(--bg-darker);
+      border-color: var(--accent);
+    }
+
+    .github-link-btn {
       border: 1px solid var(--border);
       color: var(--fg-bright);
       text-decoration: none;
@@ -413,6 +434,11 @@
         display: none;
       }
 
+      .lang-switch-btn {
+        padding: 3px 6px;
+        font-size: 11px;
+      }
+
       .page-viewport {
         padding: 16px 12px;
       }
@@ -496,11 +522,16 @@
     </div>
 
     <div class="toolbar-actions">
+      <button class="lang-switch-btn" id="lang-switch-btn" title="Switch Language / 切换中英文">
+        <span>🌐</span>
+        <span id="lang-btn-label">中文</span>
+      </button>
+
       <a href="https://github.com/zhangcy122/omarchy-online" target="_blank" rel="noopener noreferrer" class="github-link-btn" title="GitHub Repository">
         <svg height="14" width="14" viewBox="0 0 16 16" fill="currentColor">
           <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
         </svg>
-        <span>GitHub</span>
+        <span id="github-btn-label" data-i18n="githubBtn">GitHub</span>
       </a>
     </div>
   </header>
@@ -515,13 +546,13 @@
         <h1 class="hero-title">Omarchy Online</h1>
         
         <div class="hero-badge-row">
-          <span class="hero-badge">Hyprland Dwindle Tiling</span>
-          <span class="hero-badge">Native Linux VPS</span>
-          <span class="hero-badge">Zero Docker Overhead</span>
-          <span class="hero-badge">Tokyo Night Aesthetic</span>
+          <span class="hero-badge" data-i18n="badgeHyprland">Hyprland Dwindle Tiling</span>
+          <span class="hero-badge" data-i18n="badgeVPS">Native Linux VPS</span>
+          <span class="hero-badge" data-i18n="badgeZeroDocker">Zero Docker Overhead</span>
+          <span class="hero-badge" data-i18n="badgeTokyoNight">Tokyo Night Aesthetic</span>
         </div>
 
-        <p class="hero-desc">
+        <p class="hero-desc" data-i18n="heroDesc">
           Run an authentic Arch Linux & Hyprland tiling workspace directly in your browser. 
           Powered by native host Zellij Web PTY and a Caddy TLS reverse proxy, consuming under 30MB of RAM.
         </p>
@@ -530,18 +561,18 @@
         <div class="action-row">
           <button class="btn btn-primary" id="btn-spawn-term" title="Launch a new terminal window">
             <span>💻</span>
-            <span>Launch Terminal</span>
+            <span data-i18n="btnLaunchTerm">Launch Terminal</span>
             <kbd>SUPER + RETURN</kbd>
           </button>
 
           <a href="https://github.com/zhangcy122/omarchy-online" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
             <span>⭐</span>
-            <span>GitHub Repository</span>
+            <span data-i18n="btnGitHubRepo">GitHub Repository</span>
           </a>
 
           <button class="btn btn-secondary" id="btn-toggle-desktop" title="Hide/restore all windows">
             <span>🖥️</span>
-            <span>Show Desktop</span>
+            <span data-i18n="btnShowDesktop">Show Desktop</span>
             <kbd>SUPER + D</kbd>
           </button>
         </div>
@@ -551,16 +582,16 @@
       <section>
         <h2 class="section-title">
           <span>🌟</span>
-          <span>Core Capabilities</span>
+          <span data-i18n="coreCapTitle">Core Capabilities</span>
         </h2>
         <div class="features-grid" style="margin-top: 14px;">
           
           <div class="feature-card">
             <div class="feature-header">
               <div class="feature-icon">🪟</div>
-              <div class="feature-name">Hyprland Dwindle Tiling</div>
+              <div class="feature-name" data-i18n="feat1Title">Hyprland Dwindle Tiling</div>
             </div>
-            <div class="feature-body">
+            <div class="feature-body" data-i18n="feat1Desc">
               Binary Space Partitioning (BSP) tree algorithm with 10px outer gaps, 5px inner gaps, and active <span style="color: var(--accent);">#7aa2f7</span> glowing borders.
             </div>
           </div>
@@ -568,9 +599,9 @@
           <div class="feature-card">
             <div class="feature-header">
               <div class="feature-icon">⚡</div>
-              <div class="feature-name">Zero Docker Containers</div>
+              <div class="feature-name" data-i18n="feat2Title">Zero Docker Containers</div>
             </div>
-            <div class="feature-body">
+            <div class="feature-body" data-i18n="feat2Desc">
               Runs directly as native host processes on Ubuntu/Debian/Arch VPS. Direct access to system tools, compilers, and hardware with &lt;30MB RAM footprint.
             </div>
           </div>
@@ -578,9 +609,9 @@
           <div class="feature-card">
             <div class="feature-header">
               <div class="feature-icon">🛡️</div>
-              <div class="feature-name">Stateful Session Persistence</div>
+              <div class="feature-name" data-i18n="feat3Title">Stateful Session Persistence</div>
             </div>
-            <div class="feature-body">
+            <div class="feature-body" data-i18n="feat3Desc">
               Backed by Zellij Web Client. Terminal jobs, builds, and processes continue running uninterrupted when the browser tab closes or reconnects.
             </div>
           </div>
@@ -588,9 +619,9 @@
           <div class="feature-card">
             <div class="feature-header">
               <div class="feature-icon">🎨</div>
-              <div class="feature-name">Official Tokyo Night Styling</div>
+              <div class="feature-name" data-i18n="feat4Title">Official Tokyo Night Styling</div>
             </div>
-            <div class="feature-body">
+            <div class="feature-body" data-i18n="feat4Desc">
               Extracted directly from official Omarchy configs. Includes 4K curated wallpapers, Catppuccin Mocha theme switcher, and Waybar status bar.
             </div>
           </div>
@@ -598,9 +629,9 @@
           <div class="feature-card">
             <div class="feature-header">
               <div class="feature-icon">🚀</div>
-              <div class="feature-name">Walker App Launcher</div>
+              <div class="feature-name" data-i18n="feat5Title">Walker App Launcher</div>
             </div>
-            <div class="feature-body">
+            <div class="feature-body" data-i18n="feat5Desc">
               Instant fuzzy application and workspace search (<kbd>SUPER + SPACE</kbd>). Spawn Neovim, Btop, Lazygit, or terminal windows with a single keystroke.
             </div>
           </div>
@@ -608,9 +639,9 @@
           <div class="feature-card">
             <div class="feature-header">
               <div class="feature-icon">🔢</div>
-              <div class="feature-name">9 Isolated Workspaces</div>
+              <div class="feature-name" data-i18n="feat6Title">9 Isolated Workspaces</div>
             </div>
-            <div class="feature-body">
+            <div class="feature-body" data-i18n="feat6Desc">
               Workspaces 1 through 9 each maintain independent Dwindle trees and window sets, with dynamic Waybar pill dot indicators.
             </div>
           </div>
@@ -622,36 +653,36 @@
       <section>
         <h2 class="section-title">
           <span>⚖️</span>
-          <span>Architecture Comparison</span>
+          <span data-i18n="compTitle">Architecture Comparison</span>
         </h2>
         <table class="comp-table" style="margin-top: 14px;">
           <thead>
             <tr>
-              <th>Dimension</th>
-              <th>Traditional Docker / VNC</th>
-              <th>Omarchy Online</th>
+              <th data-i18n="compDim">Dimension</th>
+              <th data-i18n="compTrad">Traditional Docker / VNC</th>
+              <th data-i18n="compOmarchy">Omarchy Online</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><strong>Host Footprint</strong></td>
-              <td class="tag-red">500MB ~ 2GB RAM (KVM / Docker / X11)</td>
-              <td class="tag-green">&lt;30MB RAM (Native Linux Binary)</td>
+              <td><strong data-i18n="dimFootprint">Host Footprint</strong></td>
+              <td class="tag-red" data-i18n="tradFootprint">500MB ~ 2GB RAM (KVM / Docker / X11)</td>
+              <td class="tag-green" data-i18n="omarchyFootprint">&lt;30MB RAM (Native Linux Binary)</td>
             </tr>
             <tr>
-              <td><strong>Latency & Typing</strong></td>
-              <td class="tag-red">Compressed bitmap video streaming (~100ms)</td>
-              <td class="tag-green">Native WebGL character rendering (&lt;5ms)</td>
+              <td><strong data-i18n="dimLatency">Latency & Typing</strong></td>
+              <td class="tag-red" data-i18n="tradLatency">Compressed bitmap video streaming (~100ms)</td>
+              <td class="tag-green" data-i18n="omarchyLatency">Native WebGL character rendering (&lt;5ms)</td>
             </tr>
             <tr>
-              <td><strong>Disconnection</strong></td>
-              <td class="tag-red">VNC sessions can crash or desync</td>
-              <td class="tag-green">Zellij PTY server daemon (Zero Loss)</td>
+              <td><strong data-i18n="dimDiscon">Disconnection</strong></td>
+              <td class="tag-red" data-i18n="tradDiscon">VNC sessions can crash or desync</td>
+              <td class="tag-green" data-i18n="omarchyDiscon">Zellij PTY server daemon (Zero Loss)</td>
             </tr>
             <tr>
-              <td><strong>Environment Access</strong></td>
-              <td class="tag-red">Isolated in container containerized paths</td>
-              <td class="tag-green">Direct host shell ($HOME, packages, tools)</td>
+              <td><strong data-i18n="dimEnv">Environment Access</strong></td>
+              <td class="tag-red" data-i18n="tradEnv">Isolated in container containerized paths</td>
+              <td class="tag-green" data-i18n="omarchyEnv">Direct host shell ($HOME, packages, tools)</td>
             </tr>
           </tbody>
         </table>
@@ -661,7 +692,7 @@
       <section>
         <h2 class="section-title">
           <span>🚀</span>
-          <span>Deploy to VPS in 3 Steps</span>
+          <span data-i18n="deployTitle">Deploy to VPS in 3 Steps</span>
         </h2>
         <div class="code-box" style="margin-top: 14px;">
 git clone https://github.com/zhangcy122/omarchy-online.git<br>
@@ -672,10 +703,10 @@ cd omarchy-online &amp;&amp; ./scripts/install_zellij.sh<br>
 
       <!-- Footer -->
       <footer class="footer">
-        <div>Omarchy Online is open source under the MIT License.</div>
+        <div data-i18n="footerLicense">Omarchy Online is open source under the MIT License.</div>
         <div>
-          <a href="https://github.com/zhangcy122/omarchy-online" target="_blank" rel="noopener noreferrer">GitHub Repository</a> &bull;
-          <a href="https://github.com/basecamp/omarchy" target="_blank" rel="noopener noreferrer">Upstream Omarchy Project</a>
+          <a href="https://github.com/zhangcy122/omarchy-online" target="_blank" rel="noopener noreferrer" data-i18n="footerRepo">GitHub Repository</a> &bull;
+          <a href="https://github.com/basecamp/omarchy" target="_blank" rel="noopener noreferrer" data-i18n="footerUpstream">Upstream Omarchy Project</a>
         </div>
       </footer>
 
@@ -713,6 +744,147 @@ cd omarchy-online &amp;&amp; ./scripts/install_zellij.sh<br>
         }
       } catch (e) {
         console.warn('Toggle desktop error:', e);
+      }
+    });
+
+    // --- i18n Language Toggle (Default: English, supports Chinese) ---
+    const I18N = {
+      en: {
+        langBtn: "中文",
+        githubBtn: "GitHub",
+        title: "Omarchy Online - Home",
+        badgeHyprland: "Hyprland Dwindle Tiling",
+        badgeVPS: "Native Linux VPS",
+        badgeZeroDocker: "Zero Docker Overhead",
+        badgeTokyoNight: "Tokyo Night Aesthetic",
+        heroDesc: "Run an authentic Arch Linux &amp; Hyprland tiling workspace directly in your browser. Powered by native host Zellij Web PTY and a Caddy TLS reverse proxy, consuming under 30MB of RAM.",
+        btnLaunchTerm: "Launch Terminal",
+        btnGitHubRepo: "GitHub Repository",
+        btnShowDesktop: "Show Desktop",
+        coreCapTitle: "Core Capabilities",
+        feat1Title: "Hyprland Dwindle Tiling",
+        feat1Desc: "Binary Space Partitioning (BSP) tree algorithm with 10px outer gaps, 5px inner gaps, and active <span style=\"color: var(--accent);\">#7aa2f7</span> glowing borders.",
+        feat2Title: "Zero Docker Containers",
+        feat2Desc: "Runs directly as native host processes on Ubuntu/Debian/Arch VPS. Direct access to system tools, compilers, and hardware with &lt;30MB RAM footprint.",
+        feat3Title: "Stateful Session Persistence",
+        feat3Desc: "Backed by Zellij Web Client. Terminal jobs, builds, and processes continue running uninterrupted when the browser tab closes or reconnects.",
+        feat4Title: "Official Tokyo Night Styling",
+        feat4Desc: "Extracted directly from official Omarchy configs. Includes 4K curated wallpapers, Catppuccin Mocha theme switcher, and Waybar status bar.",
+        feat5Title: "Walker App Launcher",
+        feat5Desc: "Instant fuzzy application and workspace search (<kbd>SUPER + SPACE</kbd>). Spawn Neovim, Btop, Lazygit, or terminal windows with a single keystroke.",
+        feat6Title: "9 Isolated Workspaces",
+        feat6Desc: "Workspaces 1 through 9 each maintain independent Dwindle trees and window sets, with dynamic Waybar pill dot indicators.",
+        compTitle: "Architecture Comparison",
+        compDim: "Dimension",
+        compTrad: "Traditional Docker / VNC",
+        compOmarchy: "Omarchy Online",
+        dimFootprint: "Host Footprint",
+        tradFootprint: "500MB ~ 2GB RAM (KVM / Docker / X11)",
+        omarchyFootprint: "&lt;30MB RAM (Native Linux Binary)",
+        dimLatency: "Latency &amp; Typing",
+        tradLatency: "Compressed bitmap video streaming (~100ms)",
+        omarchyLatency: "Native WebGL character rendering (&lt;5ms)",
+        dimDiscon: "Disconnection",
+        tradDiscon: "VNC sessions can crash or desync",
+        omarchyDiscon: "Zellij PTY server daemon (Zero Loss)",
+        dimEnv: "Environment Access",
+        tradEnv: "Isolated in container containerized paths",
+        omarchyEnv: "Direct host shell ($HOME, packages, tools)",
+        deployTitle: "Deploy to VPS in 3 Steps",
+        footerLicense: "Omarchy Online is open source under the MIT License.",
+        footerRepo: "GitHub Repository",
+        footerUpstream: "Upstream Omarchy Project"
+      },
+      zh: {
+        langBtn: "English",
+        githubBtn: "代码仓库",
+        title: "Omarchy 在线体验 - 首页",
+        badgeHyprland: "Hyprland Dwindle 平铺",
+        badgeVPS: "原生 Linux VPS",
+        badgeZeroDocker: "零 Docker 内存开销",
+        badgeTokyoNight: "Tokyo Night 官方美学",
+        heroDesc: "在浏览器中直接体验原生 Arch Linux 与 Hyprland 平铺桌面。底层由宿主机 Zellij Web PTY 与 Caddy TLS 反向代理驱动，内存开销低于 30MB。",
+        btnLaunchTerm: "启动终端",
+        btnGitHubRepo: "GitHub 源码仓库",
+        btnShowDesktop: "显示桌面",
+        coreCapTitle: "核心特性",
+        feat1Title: "Hyprland Dwindle 平铺算法",
+        feat1Desc: "二叉空间分割 (BSP) 树算法排版，支持 10px 外边距、5px 窗口间隙以及 <span style=\"color: var(--accent);\">#7aa2f7</span> 霓虹聚焦发光边框。",
+        feat2Title: "零 Docker 容器开销",
+        feat2Desc: "直接以宿主机原生进程运行在 Ubuntu/Debian/Arch VPS 上，直通系统工具、编译器与硬件，内存常驻低于 30MB。",
+        feat3Title: "有状态会话无损恢复",
+        feat3Desc: "由 Zellij Web 客户端底层支持。即使关闭浏览器标签页或网络重连，后台编译、构建与运行中任务依然不中断。",
+        feat4Title: "Tokyo Night 官方定制主题",
+        feat4Desc: "直接提炼自 Omarchy 官方配置库。内置精选 4K 壁纸、Catppuccin Mocha 主题切换器与 Waybar 沉浸状态栏。",
+        feat5Title: "Walker 快速启动器",
+        feat5Desc: "毫秒级模糊应用与工作区搜索（<kbd>SUPER + SPACE</kbd>）。一键拉起 Neovim、Btop、Lazygit 或终端独立窗口。",
+        feat6Title: "9 个独立工作区",
+        feat6Desc: "工作区 1 至 9 各自维护独立的 Dwindle 平铺树与窗口集合，顶部状态栏药丸圆点动态指示活跃状态。",
+        compTitle: "架构对比",
+        compDim: "对比维度",
+        compTrad: "传统 Docker / VNC 方案",
+        compOmarchy: "Omarchy Online 原生方案",
+        dimFootprint: "宿主机内存开销",
+        tradFootprint: "500MB ~ 2GB 内存 (KVM / Docker / X11)",
+        omarchyFootprint: "&lt;30MB 内存 (Linux 原生二进制)",
+        dimLatency: "输入延迟与打字手感",
+        tradLatency: "位图压缩视频流串流 (~100ms 延迟)",
+        omarchyLatency: "原生 WebGL 字符栅格化 (&lt;5ms 极低延迟)",
+        dimDiscon: "意外断线与重连",
+        tradDiscon: "VNC 会话容易崩溃或丢状态",
+        omarchyDiscon: "Zellij PTY 守护进程（零丢失恢复）",
+        dimEnv: "系统环境与硬件访问",
+        tradEnv: "受困于容器虚拟隔离路径",
+        omarchyEnv: "直接访问宿主机 Shell（$HOME、原生包与工具链）",
+        deployTitle: "3 步一键部署到 VPS",
+        footerLicense: "Omarchy Online 基于 MIT 许可证开源。",
+        footerRepo: "GitHub 源码仓库",
+        footerUpstream: "Omarchy 上游项目"
+      }
+    };
+
+    function setLanguage(lang, broadcast = true) {
+      if (!I18N[lang]) lang = "en";
+      try {
+        localStorage.setItem("omarchy_lang", lang);
+      } catch (e) {}
+      document.documentElement.lang = lang;
+      document.title = I18N[lang].title;
+
+      const langBtnLabel = document.getElementById("lang-btn-label");
+      if (langBtnLabel) {
+        langBtnLabel.textContent = I18N[lang].langBtn;
+      }
+
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (I18N[lang] && I18N[lang][key]) {
+          el.innerHTML = I18N[lang][key];
+        }
+      });
+
+      if (broadcast) {
+        try {
+          window.parent?.postMessage({ type: "omarchy-lang-change", lang }, "*");
+        } catch (e) {}
+      }
+    }
+
+    let currentLang = "en";
+    try {
+      currentLang = localStorage.getItem("omarchy_lang") || "en";
+    } catch (e) {}
+    setLanguage(currentLang, false);
+
+    document.getElementById("lang-switch-btn")?.addEventListener("click", () => {
+      currentLang = currentLang === "en" ? "zh" : "en";
+      setLanguage(currentLang, true);
+    });
+
+    window.addEventListener("message", (event) => {
+      if (event.data && event.data.type === "omarchy-set-lang") {
+        currentLang = event.data.lang;
+        setLanguage(currentLang, false);
       }
     });
   </script>
