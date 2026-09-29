@@ -32,12 +32,13 @@ document.addEventListener('DOMContentLoaded', () => {
     renderWorkspace(currentWorkspace);
   });
 
-  // Spawn initial terminal window in workspace 1
-  spawnWindow(1, {
-    title: 'alacritty ~ user@omarchy:~ [workspace 1]',
-    type: 'terminal',
-    url: '/zellij/'
-  });
+  // Initial clean desktop boot (no windows blocking wallpaper)
+  renderWorkspace(1);
+  updateWorkspaceIndicators();
+  const activeLabel = document.getElementById('current-window-title');
+  if (activeLabel) {
+    activeLabel.textContent = 'desktop ~ workspace 1 (clean)';
+  }
 });
 
 // ============================================================
@@ -269,6 +270,35 @@ function toggleWindowFullscreen(winId = null) {
   } else {
     win.el.classList.remove('fullscreen');
     showToast('Window Restored');
+  }
+}
+
+let isDesktopShown = false;
+
+function toggleShowDesktop() {
+  const ws = workspaces[currentWorkspace];
+  if (!ws || ws.windows.length === 0) {
+    showToast('Desktop already clean (no windows open)');
+    return;
+  }
+
+  isDesktopShown = !isDesktopShown;
+  const watermark = document.getElementById('empty-desktop-watermark');
+
+  if (isDesktopShown) {
+    ws.windows.forEach(w => {
+      w.el.style.display = 'none';
+    });
+    if (watermark) watermark.classList.remove('hidden');
+    showToast('🖥️ Desktop Shown (SUPER + D to restore)');
+  } else {
+    ws.windows.forEach(w => {
+      w.el.style.display = 'flex';
+    });
+    if (watermark) watermark.classList.add('hidden');
+    renderWorkspace(currentWorkspace);
+    if (ws.focusedId) focusWindow(ws.focusedId);
+    showToast('🪟 Windows Restored');
   }
 }
 
@@ -583,6 +613,7 @@ const LAUNCHER_ITEMS = [
 
   { id: 'wp', icon: '🖼️', label: 'Cycle Wallpaper', sub: 'Change desktop background (SUPER + CTRL + SPACE)', category: 'Appearance', action: switchWallpaper },
   { id: 'theme', icon: '🎨', label: 'Toggle Tokyo Night / Catppuccin', sub: 'Switch visual palette (SUPER + SHIFT + CTRL + SPACE)', category: 'Appearance', action: toggleTheme },
+  { id: 'desktop', icon: '🖥️', label: 'Show / Hide Desktop', sub: 'Toggle all windows to view clean desktop (SUPER + D)', category: 'System', action: toggleShowDesktop },
   { id: 'keys', icon: '⌨️', label: 'Omarchy Keybindings Cheatsheet', sub: 'View all shortcut keys (SUPER + K)', category: 'System', action: () => window.toggleKeybindingsCheatsheet?.() },
   { id: 'fullscreen', icon: '⛶', label: 'Toggle Fullscreen Mode', sub: 'Lock browser keyboard for full immersion (SUPER + F)', category: 'System', action: () => toggleBrowserFullscreen() }
 ];
@@ -808,14 +839,21 @@ function handleHyprlandKeydown(e) {
     return;
   }
 
-  // 9. SUPER + W or SUPER + Q: Close focused window
-  if ((e.code === 'KeyW' || e.code === 'KeyQ') && !e.shiftKey && !e.ctrlKey) {
+  // 9. SUPER + D: Toggle Show / Hide Desktop
+  if (e.code === 'KeyD' && !e.shiftKey && !e.ctrlKey) {
+    e.preventDefault();
+    toggleShowDesktop();
+    return;
+  }
+
+  // 10. SUPER + W / SUPER + Q / SUPER + C: Close focused window
+  if ((e.code === 'KeyW' || e.code === 'KeyQ' || e.code === 'KeyC') && !e.shiftKey && !e.ctrlKey) {
     e.preventDefault();
     closeWindow(workspaces[currentWorkspace]?.focusedId);
     return;
   }
 
-  // 10. SUPER + RETURN: Spawn new terminal window
+  // 11. SUPER + RETURN: Spawn new terminal window
   if (e.code === 'Enter' && !e.shiftKey && !e.ctrlKey) {
     e.preventDefault();
     spawnWindow(currentWorkspace);
@@ -892,6 +930,9 @@ function handleHyprlandKeydown(e) {
 function initControls() {
   const fsBtn = document.getElementById('fullscreen-btn');
   fsBtn?.addEventListener('click', toggleBrowserFullscreen);
+
+  const desktopBtn = document.getElementById('show-desktop-btn');
+  desktopBtn?.addEventListener('click', toggleShowDesktop);
 }
 
 async function toggleBrowserFullscreen() {
