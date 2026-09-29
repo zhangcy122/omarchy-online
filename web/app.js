@@ -32,13 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
     renderWorkspace(currentWorkspace);
   });
 
-  // Initial clean desktop boot (no windows blocking wallpaper)
-  renderWorkspace(1);
-  updateWorkspaceIndicators();
-  const activeLabel = document.getElementById('current-window-title');
-  if (activeLabel) {
-    activeLabel.textContent = 'desktop ~ workspace 1 (clean)';
-  }
+  // Default launch: Open simulated browser window showcasing Omarchy intro & key features
+  spawnWindow(1, {
+    type: 'browser',
+    title: 'chromium ~ Omarchy Online: Hyprland Workspace for VPS',
+    url: 'browser-home.html'
+  });
 
   // Update badge if in GitHub Pages or Mock environment
   if (window.location.hostname.endsWith('github.io') || window.location.search.includes('mock=true')) {
@@ -55,6 +54,9 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================================
 
 function getTerminalUrl(type = 'terminal') {
+  if (type === 'browser') {
+    return 'browser-home.html';
+  }
   const isMockEnv = window.location.hostname.endsWith('github.io') ||
                     window.location.protocol === 'file:' ||
                     window.location.search.includes('mock=true');
@@ -633,6 +635,8 @@ const LAUNCHER_ITEMS = [
   { id: 'wp', icon: '🖼️', label: 'Cycle Wallpaper', sub: 'Change desktop background (SUPER + CTRL + SPACE)', category: 'Appearance', action: switchWallpaper },
   { id: 'theme', icon: '🎨', label: 'Toggle Tokyo Night / Catppuccin', sub: 'Switch visual palette (SUPER + SHIFT + CTRL + SPACE)', category: 'Appearance', action: toggleTheme },
   { id: 'desktop', icon: '🖥️', label: 'Show / Hide Desktop', sub: 'Toggle all windows to view clean desktop (SUPER + D)', category: 'System', action: toggleShowDesktop },
+  { id: 'browser', icon: '🌐', label: 'Chromium Browser (Omarchy Welcome)', sub: 'Launch browser showcasing Omarchy intro & key features (SUPER + SHIFT + RETURN)', category: 'Apps', action: () => spawnWindow(currentWorkspace, { type: 'browser', title: 'chromium ~ Omarchy Online: Hyprland Workspace for VPS', url: 'browser-home.html' }) },
+  { id: 'github', icon: '⭐', label: 'GitHub Repository (Source Code)', sub: 'View source code & documentation on GitHub', category: 'System', action: () => window.open('https://github.com/zhangcy122/omarchy-online', '_blank') },
   { id: 'keys', icon: '⌨️', label: 'Omarchy Keybindings Cheatsheet', sub: 'View all shortcut keys (SUPER + K)', category: 'System', action: () => window.toggleKeybindingsCheatsheet?.() },
   { id: 'fullscreen', icon: '⛶', label: 'Toggle Fullscreen Mode', sub: 'Lock browser keyboard for full immersion (SUPER + F)', category: 'System', action: () => toggleBrowserFullscreen() }
 ];
@@ -872,10 +876,18 @@ function handleHyprlandKeydown(e) {
     return;
   }
 
-  // 11. SUPER + RETURN: Spawn new terminal window
-  if (e.code === 'Enter' && !e.shiftKey && !e.ctrlKey) {
+  // 11. SUPER + RETURN: Spawn terminal / SUPER + SHIFT + RETURN: Spawn browser
+  if (e.code === 'Enter' && !e.ctrlKey) {
     e.preventDefault();
-    spawnWindow(currentWorkspace);
+    if (e.shiftKey) {
+      spawnWindow(currentWorkspace, {
+        type: 'browser',
+        title: 'chromium ~ Omarchy Online: Hyprland Workspace for VPS',
+        url: 'browser-home.html'
+      });
+    } else {
+      spawnWindow(currentWorkspace);
+    }
     return;
   }
 

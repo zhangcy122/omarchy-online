@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omarchy Online - Home</title>
+  <style>
+    :root {
+      --bg: #1a1b26;
+      --bg-dark: #13141c;
+      --bg-darker: #0e0e14;
+      --bg-lighter: #24283b;
+      --border: #414868;
+      --border-subtle: #292e42;
+      --fg: #a9b1d6;
+      --fg-bright: #c0caf5;
+      --fg-dark: #565f89;
+      --accent: #7aa2f7;
+      --accent-hover: #89b4fa;
+      --green: #9ece6a;
+      --cyan: #7dcfff;
+      --purple: #bb9af7;
+      --orange: #ff9e64;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* 1. Simulated Browser Navigation Bar */
+    .browser-toolbar {
+      background: var(--bg-dark);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--fg-dark);
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+
+    .nav-btn:hover {
+      background: var(--bg-lighter);
+      color: var(--fg-bright);
+    }
+
+    .address-bar {
+      flex: 1;
+      background: var(--bg-darker);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 4px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 12px;
+      color: var(--fg-bright);
+    }
+
+    .lock-icon {
+      color: var(--green);
+      font-size: 11px;
+    }
+
+    .url-text {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .url-highlight {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .github-link-btn {
+      background: var(--bg-lighter);
+      border: 1px solid var(--border);
+      color: var(--fg-bright);
+      text-decoration: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .github-link-btn:hover {
+      background: var(--accent);
+      color: var(--bg-darker);
+      border-color: var(--accent);
+    }
+
+    /* 2. Web Page Scrollable Content */
+    .page-viewport {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .content-container {
+      width: 100%;
+      max-width: 860px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* Hero Section */
+    .hero-section {
+      text-align: center;
+      padding: 20px 0 10px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .hero-logo {
+      height: 64px;
+      width: auto;
+      filter: drop-shadow(0 0 20px rgba(122, 162, 247, 0.4));
+    }
+
+    .hero-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--fg-bright);
+      letter-spacing: -0.5px;
+    }
+
+    .hero-badge-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .hero-badge {
+      background: rgba(122, 162, 247, 0.12);
+      border: 1px solid rgba(122, 162, 247, 0.3);
+      color: var(--accent);
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .hero-desc {
+      font-size: 15px;
+      color: var(--fg);
+      max-width: 650px;
+      line-height: 1.6;
+    }
+
+    /* Action CTA Buttons */
+    .action-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 6px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.18s ease;
+      text-decoration: none;
+      border: none;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg-darker);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 0 15px rgba(122, 162, 247, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-lighter);
+      color: var(--fg-bright);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    /* Features Grid */
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--fg-bright);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 8px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    .feature-card {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.18s ease;
+    }
+
+    .feature-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .feature-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .feature-icon {
+      font-size: 20px;
+      width: 32px;
+      height: 32px;
+      background: var(--bg-lighter);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .feature-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--fg-bright);
+    }
+
+    .feature-body {
+      font-size: 13px;
+      color: var(--fg);
+      line-height: 1.5;
+    }
+
+    /* Comparison Table */
+    .comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-dark);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      font-size: 13px;
+    }
+
+    .comp-table th, .comp-table td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .comp-table th {
+      background: var(--bg-darker);
+      color: var(--fg-bright);
+      font-weight: 700;
+    }
+
+    .comp-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .tag-green {
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    .tag-red {
+      color: #f7768e;
+    }
+
+    /* Code Snippet */
+    .code-box {
+      background: var(--bg-darker);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 12px;
+      color: var(--cyan);
+      overflow-x: auto;
+      user-select: all;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 20px 0;
+      color: var(--fg-dark);
+      font-size: 12px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    kbd {
+      background: var(--bg-lighter);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-family: inherit;
+      color: var(--fg-bright);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Simulated Browser Navigation Bar -->
+  <header class="browser-toolbar">
+    <div class="nav-buttons">
+      <button class="nav-btn" title="Back" onclick="window.history.back()">◀</button>
+      <button class="nav-btn" title="Forward" onclick="window.history.forward()">▶</button>
+      <button class="nav-btn" title="Reload" onclick="window.location.reload()">↻</button>
+    </div>
+
+    <div class="address-bar">
+      <span class="lock-icon">🔒</span>
+      <div class="url-text">
+        <span class="url-highlight">https://omarchy.online</span>/welcome
+      </div>
+    </div>
+
+    <div class="toolbar-actions">
+      <a href="https://github.com/zhangcy122/omarchy-online" target="_blank" rel="noopener noreferrer" class="github-link-btn" title="GitHub Repository">
+        <svg height="14" width="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+        <span>GitHub</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- 2. Web Page Scrollable Content -->
+  <main class="page-viewport">
+    <div class="content-container">
+
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <img src="assets/logo-white.svg" alt="Omarchy Logo" class="hero-logo">
+        <h1 class="hero-title">Omarchy Online</h1>
+        
+        <div class="hero-badge-row">
+          <span class="hero-badge">Hyprland Dwindle Tiling</span>
+          <span class="hero-badge">Native Linux VPS</span>
+          <span class="hero-badge">Zero Docker Overhead</span>
+          <span class="hero-badge">Tokyo Night Aesthetic</span>
+        </div>
+
+        <p class="hero-desc">
+          Run an authentic Arch Linux & Hyprland tiling workspace directly in your browser. 
+          Powered by native host Zellij Web PTY and a Caddy TLS reverse proxy, consuming under 30MB of RAM.
+        </p>
+
+        <!-- Interactive CTAs -->
+        <div class="action-row">
+          <button class="btn btn-primary" id="btn-spawn-term" title="Launch a new terminal window">
+            <span>💻</span>
+            <span>Launch Terminal</span>
+            <kbd>SUPER + RETURN</kbd>
+          </button>
+
+          <a href="https://github.com/zhangcy122/omarchy-online" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+            <span>⭐</span>
+            <span>GitHub Repository</span>
+          </a>
+
+          <button class="btn btn-secondary" id="btn-toggle-desktop" title="Hide/restore all windows">
+            <span>🖥️</span>
+            <span>Show Desktop</span>
+            <kbd>SUPER + D</kbd>
+          </button>
+        </div>
+      </section>
+
+      <!-- Key Features Section -->
+      <section>
+        <h2 class="section-title">
+          <span>🌟</span>
+          <span>Core Capabilities</span>
+        </h2>
+        <div class="features-grid" style="margin-top: 14px;">
+          
+          <div class="feature-card">
+            <div class="feature-header">
+              <div class="feature-icon">🪟</div>
+              <div class="feature-name">Hyprland Dwindle Tiling</div>
+            </div>
+            <div class="feature-body">
+              Binary Space Partitioning (BSP) tree algorithm with 10px outer gaps, 5px inner gaps, and active <span style="color: var(--accent);">#7aa2f7</span> glowing borders.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-header">
+              <div class="feature-icon">⚡</div>
+              <div class="feature-name">Zero Docker Containers</div>
+            </div>
+            <div class="feature-body">
+              Runs directly as native host processes on Ubuntu/Debian/Arch VPS. Direct access to system tools, compilers, and hardware with &lt;30MB RAM footprint.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-header">
+              <div class="feature-icon">🛡️</div>
+              <div class="feature-name">Stateful Session Persistence</div>
+            </div>
+            <div class="feature-body">
+              Backed by Zellij Web Client. Terminal jobs, builds, and processes continue running uninterrupted when the browser tab closes or reconnects.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-header">
+              <div class="feature-icon">🎨</div>
+              <div class="feature-name">Official Tokyo Night Styling</div>
+            </div>
+            <div class="feature-body">
+              Extracted directly from official Omarchy configs. Includes 4K curated wallpapers, Catppuccin Mocha theme switcher, and Waybar status bar.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-header">
+              <div class="feature-icon">🚀</div>
+              <div class="feature-name">Walker App Launcher</div>
+            </div>
+            <div class="feature-body">
+              Instant fuzzy application and workspace search (<kbd>SUPER + SPACE</kbd>). Spawn Neovim, Btop, Lazygit, or terminal windows with a single keystroke.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-header">
+              <div class="feature-icon">🔢</div>
+              <div class="feature-name">9 Isolated Workspaces</div>
+            </div>
+            <div class="feature-body">
+              Workspaces 1 through 9 each maintain independent Dwindle trees and window sets, with dynamic Waybar pill dot indicators.
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Architecture Comparison -->
+      <section>
+        <h2 class="section-title">
+          <span>⚖️</span>
+          <span>Architecture Comparison</span>
+        </h2>
+        <table class="comp-table" style="margin-top: 14px;">
+          <thead>
+            <tr>
+              <th>Dimension</th>
+              <th>Traditional Docker / VNC</th>
+              <th>Omarchy Online</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Host Footprint</strong></td>
+              <td class="tag-red">500MB ~ 2GB RAM (KVM / Docker / X11)</td>
+              <td class="tag-green">&lt;30MB RAM (Native Linux Binary)</td>
+            </tr>
+            <tr>
+              <td><strong>Latency & Typing</strong></td>
+              <td class="tag-red">Compressed bitmap video streaming (~100ms)</td>
+              <td class="tag-green">Native WebGL character rendering (&lt;5ms)</td>
+            </tr>
+            <tr>
+              <td><strong>Disconnection</strong></td>
+              <td class="tag-red">VNC sessions can crash or desync</td>
+              <td class="tag-green">Zellij PTY server daemon (Zero Loss)</td>
+            </tr>
+            <tr>
+              <td><strong>Environment Access</strong></td>
+              <td class="tag-red">Isolated in container containerized paths</td>
+              <td class="tag-green">Direct host shell ($HOME, packages, tools)</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Quickstart Command -->
+      <section>
+        <h2 class="section-title">
+          <span>🚀</span>
+          <span>Deploy to VPS in 3 Steps</span>
+        </h2>
+        <div class="code-box" style="margin-top: 14px;">
+git clone https://github.com/zhangcy122/omarchy-online.git<br>
+cd omarchy-online &amp;&amp; ./scripts/install_zellij.sh<br>
+./scripts/run_omarchy_web.sh start
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div>Omarchy Online is open source under the MIT License.</div>
+        <div>
+          <a href="https://github.com/zhangcy122/omarchy-online" target="_blank" rel="noopener noreferrer">GitHub Repository</a> &bull;
+          <a href="https://github.com/basecamp/omarchy" target="_blank" rel="noopener noreferrer">Upstream Omarchy Project</a>
+        </div>
+      </footer>
+
+    </div>
+  </main>
+
+  <script>
+    // Forward Hyprland global shortcuts to parent window
+    window.addEventListener('keydown', (e) => {
+      if (e.metaKey || e.altKey) {
+        try {
+          window.parent?.handleHyprlandKeydown?.(e);
+        } catch (err) {}
+      }
+    });
+
+    // Button actions interacting with parent window
+    document.getElementById('btn-spawn-term')?.addEventListener('click', () => {
+      try {
+        if (window.parent && window.parent.spawnWindow) {
+          window.parent.spawnWindow(window.parent.currentWorkspace, {
+            type: 'terminal',
+            title: 'alacritty ~ user@omarchy:~'
+          });
+        }
+      } catch (e) {
+        console.warn('Spawn terminal error:', e);
+      }
+    });
+
+    document.getElementById('btn-toggle-desktop')?.addEventListener('click', () => {
+      try {
+        if (window.parent && window.parent.toggleShowDesktop) {
+          window.parent.toggleShowDesktop();
+        }
+      } catch (e) {
+        console.warn('Toggle desktop error:', e);
+      }
+    });
+  </script>
+</body>
+</html>
