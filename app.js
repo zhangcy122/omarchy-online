@@ -39,11 +39,30 @@ document.addEventListener('DOMContentLoaded', () => {
   if (activeLabel) {
     activeLabel.textContent = 'desktop ~ workspace 1 (clean)';
   }
+
+  // Update badge if in GitHub Pages or Mock environment
+  if (window.location.hostname.endsWith('github.io') || window.location.search.includes('mock=true')) {
+    const badge = document.getElementById('agent-badge');
+    if (badge) {
+      badge.innerHTML = '<span class="pulse-dot"></span><span>GitHub Site Preview</span>';
+      badge.title = 'Running in Static Mock Preview Mode on GitHub Pages';
+    }
+  }
 });
 
 // ============================================================
 // 2. Window Manager (Spawn, Close, Focus, Float, Fullscreen)
 // ============================================================
+
+function getTerminalUrl(type = 'terminal') {
+  const isMockEnv = window.location.hostname.endsWith('github.io') ||
+                    window.location.protocol === 'file:' ||
+                    window.location.search.includes('mock=true');
+  if (isMockEnv) {
+    return `terminal-mock.html?type=${encodeURIComponent(type)}`;
+  }
+  return '/zellij/';
+}
 
 function spawnWindow(wsId = currentWorkspace, options = {}) {
   const ws = workspaces[wsId];
@@ -52,7 +71,7 @@ function spawnWindow(wsId = currentWorkspace, options = {}) {
   const winId = `win-${++windowCounter}`;
   const type = options.type || 'terminal';
   const title = options.title || `alacritty ~ user@omarchy:~ [${winId}]`;
-  const url = options.url || '/zellij/';
+  const url = options.url || getTerminalUrl(type);
 
   const winEl = document.createElement('div');
   winEl.className = 'hypr-window';
