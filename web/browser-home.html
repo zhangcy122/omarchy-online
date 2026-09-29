@@ -2,14 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Omarchy Online - Home</title>
   <style>
     :root {
       --bg: #1a1b26;
       --bg-dark: #13141c;
-      --bg-darker: #0e0e14;
+      --bg-darker: #0d0e15;
       --bg-lighter: #24283b;
+      --card-bg: rgba(26, 27, 38, 0.75);
+      --card-border: rgba(65, 72, 104, 0.45);
       --border: #414868;
       --border-subtle: #292e42;
       --fg: #a9b1d6;
@@ -21,18 +23,23 @@
       --cyan: #7dcfff;
       --purple: #bb9af7;
       --orange: #ff9e64;
+      --red: #f7768e;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
       background: var(--bg);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(122, 162, 247, 0.12) 0%, transparent 60%),
+        radial-gradient(circle at 10% 40%, rgba(187, 154, 247, 0.05) 0%, transparent 40%);
       color: var(--fg);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       font-size: 14px;
       line-height: 1.6;
       display: flex;
@@ -43,14 +50,16 @@
 
     /* 1. Simulated Browser Navigation Bar */
     .browser-toolbar {
-      background: var(--bg-dark);
-      border-bottom: 1px solid var(--border);
+      background: rgba(19, 20, 28, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
       padding: 8px 14px;
       display: flex;
       align-items: center;
       gap: 12px;
       flex-shrink: 0;
       user-select: none;
+      z-index: 20;
     }
 
     .nav-buttons {
@@ -138,6 +147,7 @@
     }
 
     .github-link-btn {
+      background: var(--bg-lighter);
       border: 1px solid var(--border);
       color: var(--fg-bright);
       text-decoration: none;
@@ -161,7 +171,7 @@
     .page-viewport {
       flex: 1;
       overflow-y: auto;
-      padding: 28px 24px;
+      padding: 24px 20px 48px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -169,33 +179,63 @@
 
     .content-container {
       width: 100%;
-      max-width: 860px;
+      max-width: 880px;
       display: flex;
       flex-direction: column;
-      gap: 28px;
+      gap: 32px;
     }
 
     /* Hero Section */
     .hero-section {
       text-align: center;
-      padding: 20px 0 10px 0;
+      padding: 16px 0 8px 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 14px;
+      position: relative;
+    }
+
+    .hero-badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(158, 206, 106, 0.12);
+      border: 1px solid rgba(158, 206, 106, 0.3);
+      color: var(--green);
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
     }
 
     .hero-logo {
       height: 64px;
       width: auto;
-      filter: drop-shadow(0 0 20px rgba(122, 162, 247, 0.4));
+      filter: drop-shadow(0 0 24px rgba(122, 162, 247, 0.45));
     }
 
     .hero-title {
-      font-size: 28px;
+      font-size: 32px;
       font-weight: 800;
       color: var(--fg-bright);
       letter-spacing: -0.5px;
+      line-height: 1.2;
     }
 
     .hero-badge-row {
@@ -206,8 +246,8 @@
     }
 
     .hero-badge {
-      background: rgba(122, 162, 247, 0.12);
-      border: 1px solid rgba(122, 162, 247, 0.3);
+      background: rgba(122, 162, 247, 0.1);
+      border: 1px solid rgba(122, 162, 247, 0.25);
       color: var(--accent);
       padding: 3px 10px;
       border-radius: 999px;
@@ -218,8 +258,8 @@
     .hero-desc {
       font-size: 15px;
       color: var(--fg);
-      max-width: 650px;
-      line-height: 1.6;
+      max-width: 660px;
+      line-height: 1.65;
     }
 
     /* Action CTA Buttons */
@@ -228,7 +268,7 @@
       gap: 12px;
       flex-wrap: wrap;
       justify-content: center;
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
     .btn {
@@ -249,59 +289,107 @@
     .btn-primary {
       background: var(--accent);
       color: var(--bg-darker);
+      box-shadow: 0 4px 14px -3px rgba(122, 162, 247, 0.5);
     }
 
     .btn-primary:hover {
       background: var(--accent-hover);
-      box-shadow: 0 0 15px rgba(122, 162, 247, 0.5);
       transform: translateY(-1px);
     }
 
     .btn-secondary {
-      background: var(--bg-lighter);
-      color: var(--fg-bright);
+      background: rgba(36, 40, 59, 0.85);
       border: 1px solid var(--border);
+      color: var(--fg-bright);
     }
 
     .btn-secondary:hover {
+      background: var(--bg-lighter);
       border-color: var(--accent);
       color: var(--accent);
       transform: translateY(-1px);
     }
 
-    /* Features Grid */
+    /* 3. Quantitative Metric Stat Bar */
+    .metrics-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px 20px;
+    }
+
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      border-right: 1px solid var(--border-subtle);
+      padding: 0 8px;
+    }
+
+    .metric-item:last-child {
+      border-right: none;
+    }
+
+    .metric-value {
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+
+    .metric-label {
+      font-size: 11px;
+      color: var(--fg-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    /* 4. Section Headers */
     .section-title {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       color: var(--fg-bright);
       display: flex;
       align-items: center;
       gap: 8px;
-      border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 8px;
+      margin-bottom: 12px;
     }
 
+    .section-title svg {
+      color: var(--accent);
+    }
+
+    /* 5. Features Grid */
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 14px;
     }
 
     .feature-card {
-      background: var(--bg-dark);
-      border: 1px solid var(--border-subtle);
-      border-radius: 10px;
-      padding: 16px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      transition: all 0.18s ease;
+      gap: 10px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .feature-card:hover {
-      border-color: var(--accent);
+      border-color: rgba(122, 162, 247, 0.55);
+      box-shadow: 0 8px 24px -6px rgba(122, 162, 247, 0.15);
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
 
     .feature-header {
@@ -310,89 +398,183 @@
       gap: 10px;
     }
 
-    .feature-icon {
-      font-size: 20px;
+    .feature-icon-box {
       width: 32px;
       height: 32px;
-      background: var(--bg-lighter);
       border-radius: 8px;
+      background: rgba(122, 162, 247, 0.12);
+      border: 1px solid rgba(122, 162, 247, 0.25);
       display: flex;
       align-items: center;
       justify-content: center;
+      color: var(--accent);
+      flex-shrink: 0;
     }
 
     .feature-name {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       color: var(--fg-bright);
     }
 
     .feature-body {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--fg);
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
-    /* Comparison Table */
+    /* 6. Comparison Table */
+    .comp-container {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
     .comp-table {
       width: 100%;
       border-collapse: collapse;
-      background: var(--bg-dark);
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid var(--border-subtle);
-      font-size: 13px;
-    }
-
-    .comp-table th, .comp-table td {
-      padding: 10px 14px;
       text-align: left;
-      border-bottom: 1px solid var(--border-subtle);
+      font-size: 12px;
     }
 
     .comp-table th {
-      background: var(--bg-darker);
+      background: rgba(19, 20, 28, 0.85);
       color: var(--fg-bright);
+      padding: 10px 14px;
       font-weight: 700;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .comp-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--fg);
     }
 
     .comp-table tr:last-child td {
       border-bottom: none;
     }
 
-    .tag-green {
+    .pill-red {
+      color: var(--red);
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 11px;
+    }
+
+    .pill-green {
       color: var(--green);
+      font-family: 'JetBrains Mono', Consolas, monospace;
       font-weight: 600;
+      font-size: 11px;
     }
 
-    .tag-red {
-      color: #f7768e;
+    /* 7. Keybindings Quick Matrix */
+    .keys-matrix {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
     }
 
-    /* Code Snippet */
-    .code-box {
-      background: var(--bg-darker);
-      border: 1px solid var(--border);
+    .key-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: 8px;
-      padding: 12px 16px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .key-label {
+      font-size: 12px;
+      color: var(--fg);
+      font-weight: 500;
+    }
+
+    /* 8. Terminal Code Box */
+    .terminal-box {
+      background: var(--bg-darker);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .terminal-header {
+      background: rgba(19, 20, 28, 0.95);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 7px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .terminal-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .term-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .term-dot.red { background: #f7768e; }
+    .term-dot.yellow { background: #e0af68; }
+    .term-dot.green { background: #9ece6a; }
+
+    .terminal-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--fg-dark);
+    }
+
+    .copy-btn {
+      background: var(--bg-lighter);
+      border: 1px solid var(--border);
+      color: var(--fg-bright);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .copy-btn:hover {
+      background: var(--accent);
+      color: var(--bg-darker);
+    }
+
+    .terminal-code {
+      padding: 14px 16px;
       font-family: 'JetBrains Mono', Consolas, monospace;
       font-size: 12px;
-      color: var(--cyan);
+      line-height: 1.7;
+      color: var(--fg-bright);
       overflow-x: auto;
-      user-select: all;
     }
+
+    .code-comment { color: var(--fg-dark); }
+    .code-cmd { color: var(--accent); }
+    .code-arg { color: var(--green); }
 
     /* Footer */
     .footer {
-      text-align: center;
+      border-top: 1px solid var(--border-subtle);
       padding: 20px 0;
+      text-align: center;
       color: var(--fg-dark);
       font-size: 12px;
-      border-top: 1px solid var(--border-subtle);
       display: flex;
       flex-direction: column;
       gap: 6px;
-      align-items: center;
     }
 
     .footer a {
@@ -409,12 +591,22 @@
       border: 1px solid var(--border);
       border-radius: 4px;
       padding: 2px 6px;
-      font-size: 11px;
-      font-family: inherit;
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
       color: var(--fg-bright);
+      white-space: nowrap;
     }
 
     /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .keys-matrix {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
     @media (max-width: 600px) {
       .browser-toolbar {
         padding: 6px 8px;
@@ -440,7 +632,7 @@
       }
 
       .page-viewport {
-        padding: 16px 12px;
+        padding: 16px 12px 32px;
       }
 
       .hero-logo {
@@ -448,20 +640,11 @@
       }
 
       .hero-title {
-        font-size: 22px;
+        font-size: 24px;
       }
 
       .hero-desc {
         font-size: 13px;
-      }
-
-      .hero-badge-row {
-        gap: 4px;
-      }
-
-      .hero-badge {
-        font-size: 10px;
-        padding: 2px 7px;
       }
 
       .action-row {
@@ -480,26 +663,44 @@
         display: none;
       }
 
+      .metrics-bar {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        padding: 12px;
+      }
+
+      .metric-item:nth-child(2) {
+        border-right: none;
+      }
+
+      .metric-item:nth-child(1), .metric-item:nth-child(2) {
+        border-bottom: 1px solid var(--border-subtle);
+        padding-bottom: 8px;
+      }
+
+      .metric-item:nth-child(3), .metric-item:nth-child(4) {
+        padding-top: 8px;
+      }
+
       .features-grid {
         grid-template-columns: 1fr;
         gap: 10px;
       }
 
-      .comp-table {
-        display: block;
+      .keys-matrix {
+        grid-template-columns: 1fr;
+      }
+
+      .comp-container {
         overflow-x: auto;
-        font-size: 11px;
+      }
+
+      .comp-table {
+        min-width: 480px;
       }
 
       .comp-table th, .comp-table td {
         padding: 8px 10px;
-      }
-
-      .code-box {
-        font-size: 11px;
-        padding: 10px;
-        white-space: pre-wrap;
-        word-break: break-all;
       }
     }
   </style>
@@ -522,7 +723,7 @@
     </div>
 
     <div class="toolbar-actions">
-      <button class="lang-switch-btn" id="lang-switch-btn" title="Switch Language / 切换中英文">
+      <button class="lang-switch-btn" id="lang-switch-btn" title="Switch Language / 切换语言">
         <span>🌐</span>
         <span id="lang-btn-label">中文</span>
       </button>
@@ -542,53 +743,79 @@
 
       <!-- Hero Section -->
       <section class="hero-section">
+        <div class="hero-badge-status">
+          <span class="pulse-dot"></span>
+          <span data-i18n="statusPill">v0.45.1 Linux Native PTY</span>
+        </div>
+
         <img src="assets/logo-white.svg" alt="Omarchy Logo" class="hero-logo">
         <h1 class="hero-title">Omarchy Online</h1>
         
         <div class="hero-badge-row">
-          <span class="hero-badge" data-i18n="badgeHyprland">Hyprland Dwindle Tiling</span>
+          <span class="hero-badge" data-i18n="badgeHyprland">Hyprland Dwindle</span>
           <span class="hero-badge" data-i18n="badgeVPS">Native Linux VPS</span>
           <span class="hero-badge" data-i18n="badgeZeroDocker">Zero Docker Overhead</span>
-          <span class="hero-badge" data-i18n="badgeTokyoNight">Tokyo Night Aesthetic</span>
+          <span class="hero-badge" data-i18n="badgeTokyoNight">Tokyo Night</span>
         </div>
 
         <p class="hero-desc" data-i18n="heroDesc">
-          Run an authentic Arch Linux & Hyprland tiling workspace directly in your browser. 
-          Powered by native host Zellij Web PTY and a Caddy TLS reverse proxy, consuming under 30MB of RAM.
+          Run an authentic Arch Linux &amp; Hyprland tiling workspace directly in your browser. Powered by native host Zellij Web PTY and a Caddy TLS reverse proxy, consuming under 30MB of RAM.
         </p>
 
         <!-- Interactive CTAs -->
         <div class="action-row">
           <button class="btn btn-primary" id="btn-spawn-term" title="Launch a new terminal window">
-            <span>💻</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
             <span data-i18n="btnLaunchTerm">Launch Terminal</span>
             <kbd>SUPER + RETURN</kbd>
           </button>
 
           <a href="https://github.com/zhangcy122/omarchy-online" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
-            <span>⭐</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
             <span data-i18n="btnGitHubRepo">GitHub Repository</span>
           </a>
 
           <button class="btn btn-secondary" id="btn-toggle-desktop" title="Hide/restore all windows">
-            <span>🖥️</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
             <span data-i18n="btnShowDesktop">Show Desktop</span>
             <kbd>SUPER + D</kbd>
           </button>
         </div>
       </section>
 
-      <!-- Key Features Section -->
+      <!-- 3. Quantitative Metric Stat Bar -->
+      <section class="metrics-bar">
+        <div class="metric-item">
+          <div class="metric-value">&lt; 30 MB</div>
+          <div class="metric-label" data-i18n="metricRam">Host RAM Footprint</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-value">&lt; 5 ms</div>
+          <div class="metric-label" data-i18n="metricLatency">WebGL PTY Latency</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-value">100%</div>
+          <div class="metric-label" data-i18n="metricState">Session Persistence</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-value">9</div>
+          <div class="metric-label" data-i18n="metricWorkspaces">Isolated Desktops</div>
+        </div>
+      </section>
+
+      <!-- 4. Key Features Section -->
       <section>
         <h2 class="section-title">
-          <span>🌟</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
           <span data-i18n="coreCapTitle">Core Capabilities</span>
         </h2>
-        <div class="features-grid" style="margin-top: 14px;">
+        <div class="features-grid">
           
           <div class="feature-card">
             <div class="feature-header">
-              <div class="feature-icon">🪟</div>
+              <div class="feature-icon-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+              </div>
               <div class="feature-name" data-i18n="feat1Title">Hyprland Dwindle Tiling</div>
             </div>
             <div class="feature-body" data-i18n="feat1Desc">
@@ -598,7 +825,9 @@
 
           <div class="feature-card">
             <div class="feature-header">
-              <div class="feature-icon">⚡</div>
+              <div class="feature-icon-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+              </div>
               <div class="feature-name" data-i18n="feat2Title">Zero Docker Containers</div>
             </div>
             <div class="feature-body" data-i18n="feat2Desc">
@@ -608,7 +837,9 @@
 
           <div class="feature-card">
             <div class="feature-header">
-              <div class="feature-icon">🛡️</div>
+              <div class="feature-icon-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              </div>
               <div class="feature-name" data-i18n="feat3Title">Stateful Session Persistence</div>
             </div>
             <div class="feature-body" data-i18n="feat3Desc">
@@ -618,7 +849,9 @@
 
           <div class="feature-card">
             <div class="feature-header">
-              <div class="feature-icon">🎨</div>
+              <div class="feature-icon-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+              </div>
               <div class="feature-name" data-i18n="feat4Title">Official Tokyo Night Styling</div>
             </div>
             <div class="feature-body" data-i18n="feat4Desc">
@@ -628,7 +861,9 @@
 
           <div class="feature-card">
             <div class="feature-header">
-              <div class="feature-icon">🚀</div>
+              <div class="feature-icon-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </div>
               <div class="feature-name" data-i18n="feat5Title">Walker App Launcher</div>
             </div>
             <div class="feature-body" data-i18n="feat5Desc">
@@ -638,7 +873,9 @@
 
           <div class="feature-card">
             <div class="feature-header">
-              <div class="feature-icon">🔢</div>
+              <div class="feature-icon-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              </div>
               <div class="feature-name" data-i18n="feat6Title">9 Isolated Workspaces</div>
             </div>
             <div class="feature-body" data-i18n="feat6Desc">
@@ -649,59 +886,110 @@
         </div>
       </section>
 
-      <!-- Architecture Comparison -->
+      <!-- 5. Architecture Comparison -->
       <section>
         <h2 class="section-title">
-          <span>⚖️</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
           <span data-i18n="compTitle">Architecture Comparison</span>
         </h2>
-        <table class="comp-table" style="margin-top: 14px;">
-          <thead>
-            <tr>
-              <th data-i18n="compDim">Dimension</th>
-              <th data-i18n="compTrad">Traditional Docker / VNC</th>
-              <th data-i18n="compOmarchy">Omarchy Online</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong data-i18n="dimFootprint">Host Footprint</strong></td>
-              <td class="tag-red" data-i18n="tradFootprint">500MB ~ 2GB RAM (KVM / Docker / X11)</td>
-              <td class="tag-green" data-i18n="omarchyFootprint">&lt;30MB RAM (Native Linux Binary)</td>
-            </tr>
-            <tr>
-              <td><strong data-i18n="dimLatency">Latency & Typing</strong></td>
-              <td class="tag-red" data-i18n="tradLatency">Compressed bitmap video streaming (~100ms)</td>
-              <td class="tag-green" data-i18n="omarchyLatency">Native WebGL character rendering (&lt;5ms)</td>
-            </tr>
-            <tr>
-              <td><strong data-i18n="dimDiscon">Disconnection</strong></td>
-              <td class="tag-red" data-i18n="tradDiscon">VNC sessions can crash or desync</td>
-              <td class="tag-green" data-i18n="omarchyDiscon">Zellij PTY server daemon (Zero Loss)</td>
-            </tr>
-            <tr>
-              <td><strong data-i18n="dimEnv">Environment Access</strong></td>
-              <td class="tag-red" data-i18n="tradEnv">Isolated in container containerized paths</td>
-              <td class="tag-green" data-i18n="omarchyEnv">Direct host shell ($HOME, packages, tools)</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <!-- Quickstart Command -->
-      <section>
-        <h2 class="section-title">
-          <span>🚀</span>
-          <span data-i18n="deployTitle">Deploy to VPS in 3 Steps</span>
-        </h2>
-        <div class="code-box" style="margin-top: 14px;">
-git clone https://github.com/zhangcy122/omarchy-online.git<br>
-cd omarchy-online &amp;&amp; ./scripts/install_zellij.sh<br>
-./scripts/run_omarchy_web.sh start
+        <div class="comp-container">
+          <table class="comp-table">
+            <thead>
+              <tr>
+                <th data-i18n="compDim">Dimension</th>
+                <th data-i18n="compTrad">Traditional Docker / VNC</th>
+                <th data-i18n="compOmarchy">Omarchy Online</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong data-i18n="dimFootprint">Host Footprint</strong></td>
+                <td class="pill-red" data-i18n="tradFootprint">500MB ~ 2GB RAM (KVM / Docker / X11)</td>
+                <td class="pill-green" data-i18n="omarchyFootprint">&lt;30MB RAM (Native Linux Binary)</td>
+              </tr>
+              <tr>
+                <td><strong data-i18n="dimLatency">Latency &amp; Typing</strong></td>
+                <td class="pill-red" data-i18n="tradLatency">Compressed bitmap video streaming (~100ms)</td>
+                <td class="pill-green" data-i18n="omarchyLatency">Native WebGL character rendering (&lt;5ms)</td>
+              </tr>
+              <tr>
+                <td><strong data-i18n="dimDiscon">Disconnection</strong></td>
+                <td class="pill-red" data-i18n="tradDiscon">VNC sessions can crash or desync</td>
+                <td class="pill-green" data-i18n="omarchyDiscon">Zellij PTY server daemon (Zero Loss)</td>
+              </tr>
+              <tr>
+                <td><strong data-i18n="dimEnv">Environment Access</strong></td>
+                <td class="pill-red" data-i18n="tradEnv">Isolated in container containerized paths</td>
+                <td class="pill-green" data-i18n="omarchyEnv">Direct host shell ($HOME, packages, tools)</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
-      <!-- Footer -->
+      <!-- 6. Keybindings Quick Reference Matrix -->
+      <section>
+        <h2 class="section-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="6" y1="8" x2="6" y2="8"></line><line x1="10" y1="8" x2="10" y2="8"></line><line x1="14" y1="8" x2="14" y2="8"></line><line x1="18" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="6" y2="12"></line><line x1="10" y1="12" x2="10" y2="12"></line><line x1="14" y1="12" x2="14" y2="12"></line><line x1="18" y1="12" x2="18" y2="12"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>
+          <span data-i18n="keysTitle">Essential Shortcuts</span>
+        </h2>
+        <div class="keys-matrix">
+          <div class="key-card">
+            <span class="key-label" data-i18n="keyTerm">Spawn Terminal</span>
+            <kbd>SUPER + RETURN</kbd>
+          </div>
+          <div class="key-card">
+            <span class="key-label" data-i18n="keyWalker">Walker Launcher</span>
+            <kbd>SUPER + SPACE</kbd>
+          </div>
+          <div class="key-card">
+            <span class="key-label" data-i18n="keyWs">Switch Workspace</span>
+            <kbd>SUPER + 1..9</kbd>
+          </div>
+          <div class="key-card">
+            <span class="key-label" data-i18n="keyDesktop">Toggle Desktop</span>
+            <kbd>SUPER + D</kbd>
+          </div>
+          <div class="key-card">
+            <span class="key-label" data-i18n="keyClose">Close Focused</span>
+            <kbd>SUPER + Q</kbd>
+          </div>
+          <div class="key-card">
+            <span class="key-label" data-i18n="keyFs">Fullscreen Mode</span>
+            <kbd>SUPER + F</kbd>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. Quickstart Terminal Box -->
+      <section>
+        <h2 class="section-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+          <span data-i18n="deployTitle">Deploy to Linux VPS</span>
+        </h2>
+        <div class="terminal-box">
+          <div class="terminal-header">
+            <div class="terminal-dots">
+              <span class="term-dot red"></span>
+              <span class="term-dot yellow"></span>
+              <span class="term-dot green"></span>
+            </div>
+            <span class="terminal-title">bash ~ deploy.sh</span>
+            <button class="copy-btn" id="copy-deploy-btn" title="Copy Commands">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span id="copy-btn-text">Copy</span>
+            </button>
+          </div>
+          <pre class="terminal-code"><span class="code-comment"># 1. Clone repository</span>
+<span class="code-cmd">git clone</span> <span class="code-arg">https://github.com/zhangcy122/omarchy-online.git</span>
+<span class="code-cmd">cd</span> <span class="code-arg">omarchy-online</span> &amp;&amp; ./scripts/install_zellij.sh
+
+<span class="code-comment"># 2. Launch Caddy TLS gateway &amp; Zellij PTY server</span>
+<span class="code-cmd">./scripts/run_omarchy_web.sh</span> <span class="code-arg">start</span></pre>
+        </div>
+      </section>
+
+      <!-- 8. Footer -->
       <footer class="footer">
         <div data-i18n="footerLicense">Omarchy Online is open source under the MIT License.</div>
         <div>
@@ -747,20 +1035,39 @@ cd omarchy-online &amp;&amp; ./scripts/install_zellij.sh<br>
       }
     });
 
+    // Copy script button
+    const copyBtn = document.getElementById('copy-deploy-btn');
+    const copyText = document.getElementById('copy-btn-text');
+    copyBtn?.addEventListener('click', () => {
+      const code = `git clone https://github.com/zhangcy122/omarchy-online.git\ncd omarchy-online && ./scripts/install_zellij.sh\n./scripts/run_omarchy_web.sh start`;
+      navigator.clipboard?.writeText(code).then(() => {
+        if (copyText) {
+          copyText.textContent = 'Copied!';
+          setTimeout(() => { copyText.textContent = 'Copy'; }, 2000);
+        }
+      });
+    });
+
     // --- i18n Language Toggle (Default: English, supports Chinese) ---
+    // Pure, factual, idiomatic wording free from AI tropes
     const I18N = {
       en: {
         langBtn: "中文",
         githubBtn: "GitHub",
         title: "Omarchy Online - Home",
-        badgeHyprland: "Hyprland Dwindle Tiling",
+        statusPill: "v0.45.1 Linux Native PTY",
+        badgeHyprland: "Hyprland Dwindle",
         badgeVPS: "Native Linux VPS",
         badgeZeroDocker: "Zero Docker Overhead",
-        badgeTokyoNight: "Tokyo Night Aesthetic",
+        badgeTokyoNight: "Tokyo Night",
         heroDesc: "Run an authentic Arch Linux &amp; Hyprland tiling workspace directly in your browser. Powered by native host Zellij Web PTY and a Caddy TLS reverse proxy, consuming under 30MB of RAM.",
         btnLaunchTerm: "Launch Terminal",
         btnGitHubRepo: "GitHub Repository",
         btnShowDesktop: "Show Desktop",
+        metricRam: "Host RAM Footprint",
+        metricLatency: "WebGL PTY Latency",
+        metricState: "Session Persistence",
+        metricWorkspaces: "Isolated Desktops",
         coreCapTitle: "Core Capabilities",
         feat1Title: "Hyprland Dwindle Tiling",
         feat1Desc: "Binary Space Partitioning (BSP) tree algorithm with 10px outer gaps, 5px inner gaps, and active <span style=\"color: var(--accent);\">#7aa2f7</span> glowing borders.",
@@ -790,7 +1097,14 @@ cd omarchy-online &amp;&amp; ./scripts/install_zellij.sh<br>
         dimEnv: "Environment Access",
         tradEnv: "Isolated in container containerized paths",
         omarchyEnv: "Direct host shell ($HOME, packages, tools)",
-        deployTitle: "Deploy to VPS in 3 Steps",
+        keysTitle: "Essential Shortcuts",
+        keyTerm: "Spawn Terminal",
+        keyWalker: "Walker Launcher",
+        keyWs: "Switch Workspace",
+        keyDesktop: "Toggle Desktop",
+        keyClose: "Close Focused",
+        keyFs: "Fullscreen Mode",
+        deployTitle: "Deploy to Linux VPS",
         footerLicense: "Omarchy Online is open source under the MIT License.",
         footerRepo: "GitHub Repository",
         footerUpstream: "Upstream Omarchy Project"
@@ -799,27 +1113,32 @@ cd omarchy-online &amp;&amp; ./scripts/install_zellij.sh<br>
         langBtn: "English",
         githubBtn: "代码仓库",
         title: "Omarchy 在线体验 - 首页",
+        statusPill: "v0.45.1 原生 Linux PTY",
         badgeHyprland: "Hyprland Dwindle 平铺",
         badgeVPS: "原生 Linux VPS",
-        badgeZeroDocker: "零 Docker 内存开销",
-        badgeTokyoNight: "Tokyo Night 官方美学",
-        heroDesc: "在浏览器中直接体验原生 Arch Linux 与 Hyprland 平铺桌面。底层由宿主机 Zellij Web PTY 与 Caddy TLS 反向代理驱动，内存开销低于 30MB。",
+        badgeZeroDocker: "免 Docker 容器",
+        badgeTokyoNight: "Tokyo Night 官方主题",
+        heroDesc: "把 Arch Linux 与 Hyprland 平铺桌面搬进浏览器。底层基于宿主机原生 Zellij PTY 与 Caddy 反向代理，内存开销低于 30MB，终端编译与长任务不因断网而中断。",
         btnLaunchTerm: "启动终端",
         btnGitHubRepo: "GitHub 源码仓库",
         btnShowDesktop: "显示桌面",
-        coreCapTitle: "核心特性",
-        feat1Title: "Hyprland Dwindle 平铺算法",
-        feat1Desc: "二叉空间分割 (BSP) 树算法排版，支持 10px 外边距、5px 窗口间隙以及 <span style=\"color: var(--accent);\">#7aa2f7</span> 霓虹聚焦发光边框。",
-        feat2Title: "零 Docker 容器开销",
-        feat2Desc: "直接以宿主机原生进程运行在 Ubuntu/Debian/Arch VPS 上，直通系统工具、编译器与硬件，内存常驻低于 30MB。",
-        feat3Title: "有状态会话无损恢复",
-        feat3Desc: "由 Zellij Web 客户端底层支持。即使关闭浏览器标签页或网络重连，后台编译、构建与运行中任务依然不中断。",
-        feat4Title: "Tokyo Night 官方定制主题",
-        feat4Desc: "直接提炼自 Omarchy 官方配置库。内置精选 4K 壁纸、Catppuccin Mocha 主题切换器与 Waybar 沉浸状态栏。",
+        metricRam: "宿主机内存占用",
+        metricLatency: "WebGL 终端延迟",
+        metricState: "会话持久化保留",
+        metricWorkspaces: "独立平铺工作区",
+        coreCapTitle: "系统核心特性",
+        feat1Title: "Hyprland BSP 平铺算法",
+        feat1Desc: "二叉空间分割 (BSP) 自动切分窗口，支持 10px 外边距与 5px 窗口间隙，聚焦窗口带 <span style=\"color: var(--accent);\">#7aa2f7</span> 霓虹发光边框。",
+        feat2Title: "宿主机原生进程直通",
+        feat2Desc: "直接以宿主机原生进程运行在 Ubuntu/Debian/Arch Linux 上，直接调用系统编译器、驱动与硬件，常驻内存仅需不到 30MB。",
+        feat3Title: "后台 PTY 会话常驻",
+        feat3Desc: "VPS 宿主机常驻 Zellij 守护进程。即使关闭浏览器标签页或网络断开重连，后台正在运行的编译与脚本依然持续执行。",
+        feat4Title: "Tokyo Night 官方配色",
+        feat4Desc: "提炼自 Omarchy 官方配置库。包含 4K 精选壁纸、Catppuccin Mocha 主题切换器与 Waybar 状态栏。",
         feat5Title: "Walker 快速启动器",
-        feat5Desc: "毫秒级模糊应用与工作区搜索（<kbd>SUPER + SPACE</kbd>）。一键拉起 Neovim、Btop、Lazygit 或终端独立窗口。",
-        feat6Title: "9 个独立工作区",
-        feat6Desc: "工作区 1 至 9 各自维护独立的 Dwindle 平铺树与窗口集合，顶部状态栏药丸圆点动态指示活跃状态。",
+        feat5Desc: "快捷键 <kbd>SUPER + SPACE</kbd> 唤出毫秒级模糊搜索。单键拉起 Neovim、Btop、Lazygit 或新建终端窗口。",
+        feat6Title: "1-9 号独立工作区",
+        feat6Desc: "1 至 9 号工作区各自维护独立的 Dwindle 平铺树与窗口集合，顶部状态栏药丸圆点动态指示当前工作区。",
         compTitle: "架构对比",
         compDim: "对比维度",
         compTrad: "传统 Docker / VNC 方案",
@@ -827,16 +1146,23 @@ cd omarchy-online &amp;&amp; ./scripts/install_zellij.sh<br>
         dimFootprint: "宿主机内存开销",
         tradFootprint: "500MB ~ 2GB 内存 (KVM / Docker / X11)",
         omarchyFootprint: "&lt;30MB 内存 (Linux 原生二进制)",
-        dimLatency: "输入延迟与打字手感",
+        dimLatency: "输入延迟与字符渲染",
         tradLatency: "位图压缩视频流串流 (~100ms 延迟)",
         omarchyLatency: "原生 WebGL 字符栅格化 (&lt;5ms 极低延迟)",
-        dimDiscon: "意外断线与重连",
+        dimDiscon: "网络中断与会话保留",
         tradDiscon: "VNC 会话容易崩溃或丢状态",
         omarchyDiscon: "Zellij PTY 守护进程（零丢失恢复）",
         dimEnv: "系统环境与硬件访问",
         tradEnv: "受困于容器虚拟隔离路径",
         omarchyEnv: "直接访问宿主机 Shell（$HOME、原生包与工具链）",
-        deployTitle: "3 步一键部署到 VPS",
+        keysTitle: "常用快捷键",
+        keyTerm: "新建终端窗口",
+        keyWalker: "Walker 启动器",
+        keyWs: "切换工作区",
+        keyDesktop: "显示/隐藏桌面",
+        keyClose: "关闭当前窗口",
+        keyFs: "全屏沉浸模式",
+        deployTitle: "部署到 Linux VPS",
         footerLicense: "Omarchy Online 基于 MIT 许可证开源。",
         footerRepo: "GitHub 源码仓库",
         footerUpstream: "Omarchy 上游项目"
