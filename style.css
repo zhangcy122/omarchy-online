@@ -91,6 +91,7 @@ body, html {
   gap: 6px;
   font-family: inherit;
   font-size: 12px;
+  text-decoration: none;
   transition: all 0.15s ease;
 }
 
