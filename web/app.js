@@ -455,8 +455,12 @@ function renderWorkspace(wsId) {
     h: desktop.clientHeight
   };
 
-  // Hyprland Dwindle layout calculation: gapsIn = 5, gapsOut = 10
-  const layout = ws.tree.calculateLayout(bounds, 5, 10);
+  const isMobile = window.innerWidth <= 768;
+  const gapsOut = isMobile ? 4 : 10;
+  const gapsIn = isMobile ? 4 : 5;
+
+  // Hyprland Dwindle layout calculation: gapsIn, gapsOut
+  const layout = ws.tree.calculateLayout(bounds, gapsIn, gapsOut);
   layout.forEach(item => {
     const w = item.window;
     if (w && w.el && !w.isFloating && !w.isFullscreen) {
@@ -964,6 +968,9 @@ function initControls() {
 
   const desktopBtn = document.getElementById('show-desktop-btn');
   desktopBtn?.addEventListener('click', toggleShowDesktop);
+
+  const quickTermBtn = document.getElementById('quick-term-btn');
+  quickTermBtn?.addEventListener('click', () => spawnWindow(currentWorkspace));
 }
 
 async function toggleBrowserFullscreen() {

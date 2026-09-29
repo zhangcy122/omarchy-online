@@ -640,3 +640,160 @@ body.bar-hidden #hypr-desktop {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* ============================================================
+   5. Mobile & Responsive Layout (Max-Width: 768px)
+   ============================================================ */
+@media (max-width: 768px) {
+  :root {
+    --bar-height: 38px;
+    --gaps-out: 4px;
+    --gaps-in: 4px;
+  }
+
+  #omarchy-bar {
+    padding: 0 8px;
+    gap: 4px;
+  }
+
+  .bar-section {
+    gap: 4px;
+  }
+
+  /* Workspaces: show active workspace and workspaces with open windows */
+  .workspace-list {
+    padding: 2px 4px;
+    gap: 2px;
+  }
+
+  .ws-item {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+  }
+
+  .ws-item:not(.active):not(.has-windows) {
+    display: none;
+  }
+
+  /* Clock: hide date, only display time */
+  .clock-date {
+    display: none;
+  }
+
+  .bar-clock {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+
+  /* Right control buttons */
+  #agent-badge {
+    display: none;
+  }
+
+  #cheatsheet-btn {
+    display: none;
+  }
+
+  .github-text {
+    display: none;
+  }
+
+  .bar-button {
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+
+  .omarchy-logo-btn {
+    padding: 3px 6px;
+  }
+
+  .omarchy-logo-btn img {
+    height: 16px;
+  }
+
+  /* Hyprland Window Titlebar */
+  .window-titlebar {
+    height: 26px;
+    padding: 0 8px;
+    font-size: 10px;
+  }
+
+  .window-title-left {
+    max-width: calc(100% - 65px);
+    gap: 6px;
+  }
+
+  .window-title-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 10px;
+  }
+
+  .window-title-badge {
+    font-size: 9px;
+    padding: 0 3px;
+  }
+
+  .win-dot {
+    width: 9px;
+    height: 9px;
+  }
+
+  .window-controls {
+    gap: 4px;
+  }
+
+  /* Empty desktop watermark */
+  .watermark-logo {
+    height: 52px;
+  }
+
+  .watermark-hint {
+    font-size: 11px;
+    padding: 0 16px;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  /* Modals */
+  .walker-window {
+    width: 95vw;
+    max-height: 85vh;
+    margin: 10px auto;
+  }
+
+  .cheatsheet-window {
+    width: 95vw;
+    max-height: 85vh;
+    margin: 10px auto;
+  }
+
+  .cheatsheet-body {
+    grid-template-columns: 1fr;
+    padding: 12px 16px;
+    gap: 14px;
+  }
+
+  /* Centered toast on mobile */
+  #toast {
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, 10px);
+    bottom: 16px;
+    width: max-content;
+    max-width: 90vw;
+    text-align: center;
+  }
+
+  #toast.show {
+    transform: translate(-50%, 0);
+  }
+}
+
+@media (max-width: 420px) {
+  .bar-clock {
+    display: none;
+  }
+}

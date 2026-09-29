@@ -392,6 +392,90 @@
       font-family: inherit;
       color: var(--fg-bright);
     }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 600px) {
+      .browser-toolbar {
+        padding: 6px 8px;
+        gap: 6px;
+      }
+
+      .nav-buttons {
+        display: none;
+      }
+
+      .address-bar {
+        padding: 4px 8px;
+        font-size: 11px;
+      }
+
+      .github-link-btn span {
+        display: none;
+      }
+
+      .page-viewport {
+        padding: 16px 12px;
+      }
+
+      .hero-logo {
+        height: 48px;
+      }
+
+      .hero-title {
+        font-size: 22px;
+      }
+
+      .hero-desc {
+        font-size: 13px;
+      }
+
+      .hero-badge-row {
+        gap: 4px;
+      }
+
+      .hero-badge {
+        font-size: 10px;
+        padding: 2px 7px;
+      }
+
+      .action-row {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 9px 12px;
+        font-size: 13px;
+      }
+
+      .btn kbd {
+        display: none;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .comp-table {
+        display: block;
+        overflow-x: auto;
+        font-size: 11px;
+      }
+
+      .comp-table th, .comp-table td {
+        padding: 8px 10px;
+      }
+
+      .code-box {
+        font-size: 11px;
+        padding: 10px;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+    }
   </style>
 </head>
 <body>
