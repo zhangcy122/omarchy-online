@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omarchy Mock Terminal</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      background: #1a1b26;
+      color: #c0caf5;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, Menlo, Monaco, 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.45;
+      overflow-x: hidden;
+      overflow-y: auto;
+      user-select: text;
+    }
+    #terminal-container {
+      padding: 12px 16px;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      cursor: text;
+    }
+    .ansi-cyan { color: #7dcfff; }
+    .ansi-blue { color: #7aa2f7; }
+    .ansi-purple { color: #bb9af7; }
+    .ansi-green { color: #9ece6a; }
+    .ansi-yellow { color: #e0af68; }
+    .ansi-red { color: #f7768e; }
+    .ansi-gray { color: #565f89; }
+    .ansi-white { color: #c0caf5; font-weight: 600; }
+    .ansi-bold { font-weight: 700; }
+    
+    pre {
+      font-family: inherit;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .output-block {
+      margin-bottom: 6px;
+    }
+
+    .command-line {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .prompt-prefix {
+      color: #7aa2f7;
+      font-weight: 700;
+      margin-right: 6px;
+      white-space: nowrap;
+    }
+
+    .prompt-dir {
+      color: #7dcfff;
+      margin-right: 6px;
+    }
+
+    .prompt-symbol {
+      color: #bb9af7;
+      font-weight: 700;
+      margin-right: 8px;
+    }
+
+    .input-wrapper {
+      display: inline-flex;
+      align-items: center;
+      flex: 1;
+      position: relative;
+    }
+
+    .cmd-text {
+      color: #c0caf5;
+      white-space: pre;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 15px;
+      background: #7aa2f7;
+      vertical-align: middle;
+      animation: blink 1s step-end infinite;
+      margin-left: 1px;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Hidden real input capturing key events on mobile/desktop */
+    #hidden-input {
+      position: absolute;
+      opacity: 0;
+      left: -9999px;
+      top: -9999px;
+      width: 1px;
+      height: 1px;
+    }
+
+    .app-screen {
+      border: 1px solid #414868;
+      border-radius: 6px;
+      padding: 10px;
+      background: #16161e;
+      margin: 8px 0;
+    }
+
+    .app-header {
+      border-bottom: 1px solid #414868;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      color: #bb9af7;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div id="terminal-container">
+    <div id="history"></div>
+    <div class="command-line" id="current-line">
+      <span class="prompt-prefix">user@omarchy</span>
+      <span class="prompt-dir">~</span>
+      <span class="prompt-symbol">&gt;</span>
+      <div class="input-wrapper">
+        <span id="cmd-display" class="cmd-text"></span>
+        <span class="cursor"></span>
+      </div>
+    </div>
+    <input type="text" id="hidden-input" autocomplete="off" autocapitalize="off" spellcheck="false">
+  </div>
+
+  <script>
+    const historyEl = document.getElementById('history');
+    const cmdDisplay = document.getElementById('cmd-display');
+    const hiddenInput = document.getElementById('hidden-input');
+    const container = document.getElementById('terminal-container');
+
+    let currentInput = '';
+    const cmdHistory = [];
+    let historyIndex = -1;
+
+    const FASTFETCH_ART = `
+                   <span class="ansi-blue">-\`</span>                    <span class="ansi-cyan ansi-bold">user</span><span class="ansi-purple ansi-bold">@</span><span class="ansi-blue ansi-bold">omarchy</span>
+                  <span class="ansi-blue">.o+\`</span>                   <span class="ansi-gray">------------</span>
+                 <span class="ansi-blue">\`ooo/</span>                   <span class="ansi-purple">OS:</span> Arch Linux x86_64 (VPS Native)
+                <span class="ansi-blue">\`+oooo:</span>                  <span class="ansi-purple">Host:</span> Omarchy Online Cloud
+               <span class="ansi-blue">\`+oooooo:</span>                 <span class="ansi-purple">Kernel:</span> 6.8.0-arch1-1
+               <span class="ansi-blue">-+oooooo+:</span>                <span class="ansi-purple">Uptime:</span> 4 days, 12 hours
+             <span class="ansi-blue">\`/:-:++oooo+:</span>               <span class="ansi-purple">Packages:</span> 842 (pacman)
+            <span class="ansi-blue">\`/++++/+++++++:</span>              <span class="ansi-purple">Shell:</span> fish 3.7.0
+           <span class="ansi-blue">\`/++++++++++++++:</span>             <span class="ansi-purple">WM:</span> Hyprland (Dwindle BSP)
+          <span class="ansi-blue">\`/+++ooooooooooooo/\`</span>           <span class="ansi-purple">Theme:</span> Tokyo Night (Omarchy Default)
+         <span class="ansi-blue">./ooosssso++osssssso+\`</span>          <span class="ansi-purple">Terminal:</span> Alacritty / Zellij Web
+        <span class="ansi-blue">.oossssso-\`\`\`\`/ossssss+\`</span>         <span class="ansi-purple">CPU:</span> AMD EPYC 7763 (4) @ 2.449GHz
+       <span class="ansi-blue">-osssssso.      :ssssssso.</span>        <span class="ansi-purple">Memory:</span> 482MiB / 7912MiB (6%)
+      <span class="ansi-blue">:osssssss/        osssso+++.</span>       <span class="ansi-purple">AI Agent:</span> Hermes Agent (Active)
+     <span class="ansi-blue">/ossssssss/        +ssssooo/-</span>       <span class="ansi-purple">Network:</span> 10Gbps VirtIO
+   <span class="ansi-blue">\`/ossssso+/:-        -:/+osssso+-</span>     <span class="ansi-green">● Online Mock Preview Mode</span>
+  <span class="ansi-blue">\`+sso+:-\`                 \`.-/+oso:</span>
+ <span class="ansi-blue">\`++:.                           \`-/+/</span>
+ <span class="ansi-blue">.\`                                 \`/</span>
+`;
+
+    function appendOutput(html) {
+      const block = document.createElement('div');
+      block.className = 'output-block';
+      block.innerHTML = html;
+      historyEl.appendChild(block);
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function executeCommand(cmd) {
+      const trimmed = cmd.trim();
+      if (!trimmed) {
+        appendOutput(`<div class="command-line"><span class="prompt-prefix">user@omarchy</span> <span class="prompt-dir">~</span> <span class="prompt-symbol">&gt;</span></div>`);
+        return;
+      }
+
+      cmdHistory.push(trimmed);
+      historyIndex = cmdHistory.length;
+
+      // Print command entered
+      appendOutput(`<div class="command-line"><span class="prompt-prefix">user@omarchy</span> <span class="prompt-dir">~</span> <span class="prompt-symbol">&gt;</span> <span class="ansi-white">${escapeHtml(trimmed)}</span></div>`);
+
+      const parts = trimmed.split(' ');
+      const mainCmd = parts[0].toLowerCase();
+
+      switch (mainCmd) {
+        case 'help':
+          appendOutput(`
+<span class="ansi-cyan ansi-bold">Omarchy Online Interactive Shell ~ Available Commands:</span>
+  <span class="ansi-green">fastfetch</span>     Display Arch Linux & Omarchy system information
+  <span class="ansi-green">btop</span>          Launch terminal resource monitor (CPU, Memory, Disks)
+  <span class="ansi-green">nvim</span>          Open Neovim editor (Tokyo Night Omarchy config)
+  <span class="ansi-green">lazygit</span>       Launch git terminal UI
+  <span class="ansi-green">ls, ll</span>        List directory contents
+  <span class="ansi-green">cat</span> &lt;file&gt;    Print file content
+  <span class="ansi-green">caw</span>           Show Code as World 7-step engine status
+  <span class="ansi-green">hermes</span>        Nous Hermes AI Agent terminal interface
+  <span class="ansi-green">uname -a</span>      Display system kernel info
+  <span class="ansi-green">whoami</span>        Display current logged-in user
+  <span class="ansi-green">clear</span>         Clear terminal screen
+`);
+          break;
+
+        case 'fastfetch':
+        case 'neofetch':
+          appendOutput(`<pre>${FASTFETCH_ART}</pre>`);
+          break;
+
+        case 'btop':
+          appendOutput(`
+<div class="app-screen">
+  <div class="app-header">
+    <span>btop++ v1.3.2 - Omarchy VPS Monitor</span>
+    <span>CPU: 4.2% | MEM: 482MB/7.9GB | DISK: 12GB/120GB</span>
+  </div>
+  <pre style="color: #7dcfff;">
+  CPU [|||.....................................] 4.2% (AMD EPYC 7763 4 Cores)
+  MEM [|||||...................................] 6.1% (482MB / 7.9GB)
+  SWP [........................................] 0.0% (0B / 4.0GB)
+  NET ▼ 1.2 MB/s | ▲ 420 KB/s (eth0)
+  
+  <span class="ansi-purple">PID    USER    PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND</span>
+  1042   ubuntu  20   0  128.4M  28.2M  12.1M S   2.1   0.4   0:14.22 zellij
+  1088   ubuntu  20   0   45.2M  14.5M   8.2M S   1.0   0.2   0:08.45 caddy
+  2104   ubuntu  20   0  350.1M  89.4M  45.0M S   0.8   1.1   0:04.12 fish
+  2540   ubuntu  20   0   85.4M  18.2M  10.0M R   0.3   0.2   0:01.05 btop
+  </pre>
+</div>
+`);
+          break;
+
+        case 'nvim':
+        case 'vim':
+          appendOutput(`
+<div class="app-screen">
+  <div class="app-header">
+    <span>NVIM v0.10.0 - ~/.config/hypr/looknfeel.lua</span>
+    <span>[Lua] [utf-8] [unix]</span>
+  </div>
+  <pre style="color: #c0caf5;">
+  <span class="ansi-gray"> 1</span> <span class="ansi-purple">-- Omarchy Hyprland Look & Feel Config</span>
+  <span class="ansi-gray"> 2</span> <span class="ansi-cyan">return</span> {
+  <span class="ansi-gray"> 3</span>   <span class="ansi-blue">general</span> = {
+  <span class="ansi-gray"> 4</span>     <span class="ansi-yellow">gaps_in</span> = <span class="ansi-green">5</span>,
+  <span class="ansi-gray"> 5</span>     <span class="ansi-yellow">gaps_out</span> = <span class="ansi-green">10</span>,
+  <span class="ansi-gray"> 6</span>     <span class="ansi-yellow">border_size</span> = <span class="ansi-green">2</span>,
+  <span class="ansi-gray"> 7</span>     <span class="ansi-yellow">col_active_border</span> = <span class="ansi-cyan">"rgba(7aa2f7ee)"</span>,
+  <span class="ansi-gray"> 8</span>     <span class="ansi-yellow">layout</span> = <span class="ansi-cyan">"dwindle"</span>,
+  <span class="ansi-gray"> 9</span>   }
+  <span class="ansi-gray">10</span> }
+  <span class="ansi-gray">~</span>
+  <span class="ansi-gray">~</span>
+  <span class="ansi-green">-- NORMAL -- Press SUPER + RETURN to open another split terminal</span>
+  </pre>
+</div>
+`);
+          break;
+
+        case 'lazygit':
+          appendOutput(`
+<div class="app-screen">
+  <div class="app-header">
+    <span>Lazygit - omarchy-online (main)</span>
+    <span>[Status: Clean]</span>
+  </div>
+  <pre style="color: #9ece6a;">
+  [Files (0)] Working tree clean
+  [Branches]  * main (origin/main)
+              feature/20260926_v1
+  [Commits]   b305248 Merge branch 'feature/20260926_v1' into main
+              15d4bb3 feat(web): enable clean desktop boot and show desktop toggle
+              71663f1 feat(web): implement Hyprland dwindle multi-terminal window manager
+  </pre>
+</div>
+`);
+          break;
+
+        case 'ls':
+        case 'll':
+          appendOutput(`
+<span class="ansi-blue ansi-bold">Desktop</span>  <span class="ansi-blue ansi-bold">Documents</span>  <span class="ansi-blue ansi-bold">Projects</span>  <span class="ansi-blue ansi-bold">dotfiles</span>
+<span class="ansi-green">run_omarchy.sh</span>  <span class="ansi-purple">config.kdl</span>  <span class="ansi-yellow">README.md</span>
+`);
+          break;
+
+        case 'cat':
+          const file = parts[1] || '';
+          if (file === 'README.md' || file === 'readme.md') {
+            appendOutput(`<span class="ansi-cyan"># Omarchy Online - Hyprland Tiling Workspace for VPS\nRunning natively on Arch Linux / Ubuntu without Docker containers.</span>`);
+          } else if (file) {
+            appendOutput(`<span class="ansi-gray">Content of ${escapeHtml(file)} (mock placeholder)</span>`);
+          } else {
+            appendOutput(`<span class="ansi-red">cat: missing file operand</span>`);
+          }
+          break;
+
+        case 'caw':
+          appendOutput(`
+<span class="ansi-cyan ansi-bold">Code as World (CaW) ~ Digital Twin World State:</span>
+  • Base Commit: <span class="ansi-green">b305248</span> (main)
+  • Entities: <span class="ansi-yellow">2,813</span> | Invariant Guards: <span class="ansi-green">ACTIVE</span>
+  • 2PC Optimistic Concurrency Lock: <span class="ansi-green">LOCKED & VERIFIED</span>
+`);
+          break;
+
+        case 'hermes':
+          appendOutput(`
+<span class="ansi-purple ansi-bold">🤖 Hermes AI Agent (Nous Research):</span>
+  Autonomous reasoning terminal companion online.
+  Ready to inspect codebase, execute tests, and formulate OpenSpec proposals.
+`);
+          break;
+
+        case 'uname':
+        case 'uname -a':
+          appendOutput(`Linux omarchy 6.8.0-arch1-1 SMP PREEMPT_DYNAMIC x86_64 GNU/Linux`);
+          break;
+
+        case 'whoami':
+          appendOutput(`user`);
+          break;
+
+        case 'clear':
+          historyEl.innerHTML = '';
+          break;
+
+        default:
+          appendOutput(`<span class="ansi-red">fish: Unknown command '${escapeHtml(trimmed)}'. Type 'help' for available commands.</span>`);
+          break;
+      }
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function focusInput() {
+      hiddenInput.focus();
+    }
+
+    // Auto-focus and handle clicks
+    document.addEventListener('click', focusInput);
+    container.addEventListener('click', focusInput);
+
+    hiddenInput.addEventListener('input', (e) => {
+      currentInput = hiddenInput.value;
+      cmdDisplay.textContent = currentInput;
+    });
+
+    hiddenInput.addEventListener('keydown', (e) => {
+      // Forward global Hyprland key combinations to parent window if SUPER/ALT pressed
+      if (e.metaKey || e.altKey) {
+        try {
+          window.parent?.handleHyprlandKeydown?.(e);
+        } catch (err) {}
+      }
+
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const cmd = currentInput;
+        hiddenInput.value = '';
+        currentInput = '';
+        cmdDisplay.textContent = '';
+        executeCommand(cmd);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (cmdHistory.length > 0 && historyIndex > 0) {
+          historyIndex--;
+          currentInput = cmdHistory[historyIndex];
+          hiddenInput.value = currentInput;
+          cmdDisplay.textContent = currentInput;
+        }
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (historyIndex < cmdHistory.length - 1) {
+          historyIndex++;
+          currentInput = cmdHistory[historyIndex];
+          hiddenInput.value = currentInput;
+          cmdDisplay.textContent = currentInput;
+        } else {
+          historyIndex = cmdHistory.length;
+          currentInput = '';
+          hiddenInput.value = '';
+          cmdDisplay.textContent = '';
+        }
+      }
+    });
+
+    // Check URL parameters for direct app launch
+    window.addEventListener('DOMContentLoaded', () => {
+      focusInput();
+      const params = new URLSearchParams(window.location.search);
+      const appType = params.get('type') || 'terminal';
+
+      if (appType === 'nvim' || appType === 'editor') {
+        executeCommand('nvim');
+      } else if (appType === 'btop' || appType === 'monitor') {
+        executeCommand('btop');
+      } else if (appType === 'git' || appType === 'lazygit') {
+        executeCommand('lazygit');
+      } else {
+        // Initial banner
+        appendOutput(`<pre>${FASTFETCH_ART}</pre>`);
+        appendOutput(`<div style="color: #565f89; margin-bottom: 6px;">Type '<span class="ansi-green">help</span>' for a list of available commands. Press <span class="ansi-yellow">SUPER + RETURN</span> to spawn new tiling windows.</div>`);
+      }
+    });
+  </script>
+</body>
+</html>

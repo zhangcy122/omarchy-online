@@ -1,117 +1,145 @@
 # Omarchy Online 🚀
 
-> 在原生 Ubuntu VPS 上运行、无需 Docker 容器，通过 Web 浏览器提供 1:1 逼近 **Omarchy** 体验的平铺多终端工作台。
+[English](README.md) | [简体中文](README_zh.md)
 
-基于 **Zellij Web Client (v0.45.1)** 与 **Caddy (TLS/WSS Reverse Proxy)** 架构，开箱即用，零容器污染，低资源消耗（<30MB RAM），硬件级 WebGL 流畅渲染与断线持久化会话。
+> Run an Omarchy-inspired Hyprland tiling workspace natively on an Ubuntu VPS through your web browser — without Docker containers.
 
----
+[![Live Mock Preview](https://img.shields.io/badge/Live_Demo-GitHub_Pages-7aa2f7?style=for-the-badge&logo=github)](https://zhangcy122.github.io/omarchy-online/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+[![Theme: Tokyo Night](https://img.shields.io/badge/Theme-Tokyo_Night-1a1b26?style=for-the-badge)](web/style.css)
 
-## 🌟 核心特性
-
-- 🖥️ **无容器原生运行**：直接运行在 Ubuntu 宿主机上，无需 Docker / KVM，完整复用本地环境与命令行工具链。
-- 🎨 **Omarchy 专属视觉**：预置 Omarchy 官方同款 **Tokyo Night** 和 **Catppuccin Mocha** 主题色板。
-- 🪟 **Hyprland 式平铺窗口与工作区**：支持多 Tab/工作区、垂直/水平分割窗格（Tiling）、浮动窗口（Floating Panes）与全屏放大。
-- ⚡ **WebGL 硬件加速**：内置最新 `xterm.js` WebGL2 渲染引擎，打字与高频滚动极度丝滑。
-- 🔒 **安全前置网关**：Caddy 统一负责 TLS (HTTPS / WSS) 终止，后端绑定 `127.0.0.1:8082`，支持 Token 令牌登录认证。
-- 🛡️ **会话断线永不丢失**：浏览器关闭、刷新或网络波动后重新连接，所有终端会话与正在运行的程序保持原状。
+**Omarchy Online** brings the aesthetic and workflow of [Omarchy](https://github.com/basecamp/omarchy) (Arch Linux + Hyprland) to your browser. It runs natively on your VPS host using **Zellij Web** and a **Caddy** TLS reverse proxy, consuming less than 30MB of RAM while preserving full session persistence across disconnections.
 
 ---
 
-## 📁 目录结构
+## 🌐 Live Preview
 
+You can try the frontend interface and Hyprland Dwindle tiling layout directly on GitHub Pages:
+
+👉 **[https://zhangcy122.github.io/omarchy-online/](https://zhangcy122.github.io/omarchy-online/)**
+
+The static GitHub Pages deployment runs in **Mock Preview Mode**, featuring an interactive terminal simulation (`fastfetch`, `btop`, `nvim`, `lazygit`) and full Hyprland window tiling.
+
+---
+
+## ✨ Key Features
+
+- **No Docker Required**: Runs directly as native Linux processes on your Ubuntu VPS. Zero container overhead, full access to host toolchains, packages, and hardware.
+- **Hyprland Dwindle Tiling**: Binary Space Partitioning (BSP) layout engine with 10px outer gaps, 5px inner gaps, and active `#7aa2f7` borders.
+- **Clean Desktop by Default**: Boots to an unblocked desktop with official 4K wallpapers and Omarchy branding watermark. Press `SUPER + RETURN` to spawn terminals on demand.
+- **Show Desktop Toggle (`SUPER + D`)**: Hide all windows instantly to inspect the desktop, and restore them with identical geometry.
+- **Isolated Workspaces (1–9)**: Switch between 9 independent workspaces with Waybar dot indicators for active workspaces.
+- **Walker App Launcher (`SUPER + SPACE`)**: Fast application and tool launcher with fuzzy search.
+- **Session Persistence**: Zellij keeps terminal sessions alive even when closing the browser tab or experiencing network drops.
+- **Caddy TLS Proxy**: Built-in HTTPS/WSS termination on port `8443` with local certificate generation.
+
+---
+
+## ⌨️ Hyprland Keybindings
+
+| Action | Shortcut |
+| :--- | :--- |
+| **Spawn Terminal Window** | <kbd>SUPER</kbd> + <kbd>RETURN</kbd> |
+| **Close Active Window** | <kbd>SUPER</kbd> + <kbd>W</kbd> / <kbd>Q</kbd> / <kbd>C</kbd> (or click 🔴 dot) |
+| **Toggle Show / Hide Desktop** | <kbd>SUPER</kbd> + <kbd>D</kbd> (or click 🖥️ on bar) |
+| **Toggle Floating / Tiling Mode** | <kbd>SUPER</kbd> + <kbd>T</kbd> |
+| **Toggle Fullscreen Window** | <kbd>SUPER</kbd> + <kbd>F</kbd> |
+| **Toggle Split Direction** | <kbd>SUPER</kbd> + <kbd>J</kbd> |
+| **Cycle Window Focus** | <kbd>ALT</kbd> + <kbd>TAB</kbd> |
+| **Directional Window Focus** | <kbd>SUPER</kbd> + <kbd>Arrow Keys</kbd> |
+| **Switch Workspace 1–9** | <kbd>SUPER</kbd> + <kbd>1..9</kbd> |
+| **Move Window to Workspace** | <kbd>SUPER</kbd> + <kbd>SHIFT</kbd> + <kbd>1..9</kbd> |
+| **Next / Prev Workspace** | <kbd>SUPER</kbd> + <kbd>TAB</kbd> / <kbd>SUPER</kbd> + <kbd>SHIFT</kbd> + <kbd>TAB</kbd> |
+| **Walker App Launcher** | <kbd>SUPER</kbd> + <kbd>SPACE</kbd> |
+| **Cycle 4K Wallpapers** | <kbd>SUPER</kbd> + <kbd>CTRL</kbd> + <kbd>SPACE</kbd> |
+| **Toggle Tokyo Night / Catppuccin** | <kbd>SUPER</kbd> + <kbd>SHIFT</kbd> + <kbd>CTRL</kbd> + <kbd>SPACE</kbd> |
+| **Toggle Top Bar Visibility** | <kbd>SUPER</kbd> + <kbd>SHIFT</kbd> + <kbd>SPACE</kbd> |
+| **View Keybindings Cheatsheet** | <kbd>SUPER</kbd> + <kbd>K</kbd> |
+
+*(Note: On macOS, <kbd>Command</kbd> or <kbd>Option</kbd> maps to <kbd>SUPER</kbd>).*
+
+---
+
+## 🚀 Quickstart (Production VPS)
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/zhangcy122/omarchy-online.git
+cd omarchy-online
 ```
-omarchy-online/
-├── config/
-│   ├── zellij/
-│   │   └── config.kdl         # Omarchy Tokyo Night 主题、快捷键与 UI 布局配置
-│   └── caddy/
-│       ├── Caddyfile          # TLS 证书反代、安全响应头与 WebSocket 转发配置
-│       ├── cert.pem           # 自动生成的本地自签名证书
-│       └── key.pem            # 私钥
-├── scripts/
-│   ├── install_zellij.sh      # 自动下载安装含 Web Client 的 Zellij v0.45.1 静态二进制
-│   └── run_omarchy_web.sh     # 服务生命周期管理 (start / stop / status / token)
-├── systemd/
-│   └── zellij-web.service     # Systemd 用户级后台守护进程配置
-└── README.md
-```
 
----
-
-## 🚀 快速上手 (Quickstart)
-
-### 1. 安装 Zellij (含 Web 客户端)
+### 2. Install Zellij with Web Client
 ```bash
 ./scripts/install_zellij.sh
 ```
 
-### 2. 启动服务 (Zellij Web + Caddy)
+### 3. Start the Web & Reverse Proxy Service
 ```bash
 ./scripts/run_omarchy_web.sh start
 ```
-此时 Web 服务已在后台启动：
-- **Web 访问入口**：`https://<你的VPS-IP>:8443` 或本地 `https://127.0.0.1:8443`
+The service will start on `https://<YOUR-VPS-IP>:8443` (or `https://127.0.0.1:8443` locally).
 
-### 3. 创建登录 Token
-为了安全防护，Zellij Web 客户端首次使用时需要输入 Token：
+### 4. Generate Login Token
+For security, Zellij requires an access token on first connection:
 ```bash
 ./scripts/run_omarchy_web.sh token
 ```
-系统会输出形如以下的 Token，直接在网页输入即可登录：
-```
-Created token successfully
-token_1: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-```
+Copy the token printed in terminal and paste it into the web prompt.
 
 ---
 
-## 🛠️ 服务运维与命令参考
+## 🛠️ Service Management
 
 ```bash
-# 查看服务运行状态
+# Check status of Zellij and Caddy
 ./scripts/run_omarchy_web.sh status
 
-# 查看已有 Token 列表
+# List active authentication tokens
 ./scripts/run_omarchy_web.sh list-tokens
 
-# 停止所有服务
+# Stop the services
 ./scripts/run_omarchy_web.sh stop
 
-# 重新启动服务
-./scripts/run_omarchy_web.sh start
+# Restart the services
+./scripts/run_omarchy_web.sh restart
 ```
 
 ---
 
-## ⌨️ 常用快捷键指引
+## 📁 Repository Structure
 
-| 操作 | 快捷键 |
-| :--- | :--- |
-| **新建平铺窗格 (Split)** | `Ctrl + p` 然后按 `n` (新建)、`r` (向右切)、`d` (向下切) |
-| **窗格间穿梭 (Focus)** | `Ctrl + p` 然后按 `h/j/k/l` 或方向键 |
-| **切换全屏最大化** | `Ctrl + p` 然后按 `f` |
-| **关闭当前活动窗格** | `Ctrl + p` 然后按 `x` |
-| **新建工作区 (Tab)** | `Ctrl + t` 然后按 `n` |
-| **切换工作区 (Tab)** | `Ctrl + t` 然后按 `1~9` 或 `h/l` |
-| **浮动窗格切换** | `Ctrl + p` 然后按 `w` |
+```
+omarchy-online/
+├── .github/
+│   └── workflows/
+│       └── deploy-pages.yml    # Automated GitHub Pages static preview deployment
+├── config/
+│   ├── caddy/
+│   │   └── Caddyfile           # TLS proxy, security headers & WebSocket rules
+│   └── zellij/
+│       └── config.kdl          # Tokyo Night theme & keybindings for Zellij
+├── openspec/                   # OpenSpec capabilities & change proposals
+├── scripts/
+│   ├── install_zellij.sh       # Downloads Zellij static binary with Web client
+│   ├── run_omarchy_web.sh      # Service lifecycle supervisor
+│   ├── test_clean_desktop.py   # Playwright E2E verification for desktop mode
+│   └── test_hyprland_dwindle.py# Playwright E2E verification for BSP tiling
+├── systemd/
+│   └── zellij-web.service      # Optional systemd user unit
+├── web/                        # Frontend assets served by Caddy & GitHub Pages
+│   ├── assets/                 # Official Omarchy SVG logos & 4K wallpapers
+│   ├── app.js                  # Window manager, shortcuts & workspace state
+│   ├── dwindle.js              # Hyprland Dwindle BSP layout engine
+│   ├── index.html              # Desktop shell markup & Waybar top bar
+│   ├── style.css               # Tokyo Night aesthetic & window styling
+│   └── terminal-mock.html      # Interactive terminal simulator for static preview
+├── README.md                   # English documentation
+└── README_zh.md                # Chinese documentation
+```
 
 ---
 
-## 🌐 域名与公共 HTTPS 配置 (可选)
+## 📄 License
 
-若你在 VPS 上绑定了真实域名（如 `omarchy.yourdomain.com`）：
-1. 编辑 `config/caddy/Caddyfile`：
-   ```caddy
-   omarchy.yourdomain.com {
-       # Caddy 会自动通过 Let's Encrypt 申请官方免费 HTTPS 证书
-       reverse_proxy 127.0.0.1:8082 {
-           header_up Host {upstream_hostport}
-           header_up X-Real-IP {remote_host}
-       }
-   }
-   ```
-2. 重启 Caddy：
-   ```bash
-   ./scripts/run_omarchy_web.sh stop && ./scripts/run_omarchy_web.sh start
-   ```
-   即可通过标准 443 端口安全访问。
+MIT License. See [LICENSE](LICENSE) for details.
+Official artwork, logos, and Tokyo Night configurations are copyright their respective upstream authors (Omarchy / Basecamp).
