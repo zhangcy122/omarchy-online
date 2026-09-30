@@ -197,6 +197,122 @@ class DwindleTree {
     traverse(this.root, area);
     return rects;
   }
+
+  /**
+   * Swap two windows in the tree (swaps window payloads of leaf nodes)
+   */
+  swapWindows(windowIdA, windowIdB) {
+    const leafA = this.findLeaf(windowIdA);
+    const leafB = this.findLeaf(windowIdB);
+    if (!leafA || !leafB || leafA === leafB) return false;
+    const tempWin = leafA.window;
+    leafA.window = leafB.window;
+    leafB.window = tempWin;
+    return true;
+  }
+
+  /**
+   * Move / swap window in a given direction ('left', 'right', 'up', 'down')
+   */
+  moveWindowDirection(windowId, direction) {
+    const leaf = this.findLeaf(windowId);
+    if (!leaf || !leaf.window || !leaf.window.rect) return null;
+
+    const allLeaves = [];
+    const collect = (n) => {
+      if (!n) return;
+      if (n.isLeaf() && n.window && n.window.rect) allLeaves.push(n);
+      else {
+        collect(n.left);
+        collect(n.right);
+      }
+    };
+    collect(this.root);
+
+    if (allLeaves.length <= 1) return null;
+
+    const cur = leaf.window.rect;
+    const curCx = cur.x + cur.w / 2;
+    const curCy = cur.y + cur.h / 2;
+
+    let bestNeighbor = null;
+    let minDistance = Infinity;
+
+    for (const other of allLeaves) {
+      if (other.window.id === windowId) continue;
+      const r = other.window.rect;
+      const oCx = r.x + r.w / 2;
+      const oCy = r.y + r.h / 2;
+
+      let isMatch = false;
+      if (direction === 'left' && oCx < curCx) isMatch = true;
+      else if (direction === 'right' && oCx > curCx) isMatch = true;
+      else if (direction === 'up' && oCy < curCy) isMatch = true;
+      else if (direction === 'down' && oCy > curCy) isMatch = true;
+
+      if (isMatch) {
+        const dx = oCx - curCx;
+        const dy = oCy - curCy;
+        const dist = Math.hypot(dx, dy);
+        if (dist < minDistance) {
+          minDistance = dist;
+          bestNeighbor = other;
+        }
+      }
+    }
+
+    if (bestNeighbor) {
+      this.swapWindows(windowId, bestNeighbor.window.id);
+      return bestNeighbor.window.id;
+    }
+    return null;
+  }
+
+  /**
+   * Serialize tree topology to JSON-friendly object
+   */
+  serialize(node = this.root) {
+    if (!node) return null;
+    if (node.isLeaf()) {
+      return {
+        type: 'leaf',
+        windowId: node.window ? node.window.id : null
+      };
+    }
+    return {
+      type: 'internal',
+      split: node.split,
+      ratio: node.ratio,
+      left: this.serialize(node.left),
+      right: this.serialize(node.right)
+    };
+  }
+
+  /**
+   * Deserialize tree topology from JSON object given a windowMap
+   */
+  static deserialize(data, windowMap = {}) {
+    const tree = new DwindleTree();
+    if (!data) return tree;
+
+    const build = (nodeData, parent = null) => {
+      if (!nodeData) return null;
+      const node = new DwindleNode(nodeData.type);
+      node.parent = parent;
+      if (nodeData.type === 'leaf') {
+        node.window = windowMap[nodeData.windowId] || null;
+        return node;
+      }
+      node.split = nodeData.split || 'v';
+      node.ratio = nodeData.ratio !== undefined ? nodeData.ratio : 0.5;
+      node.left = build(nodeData.left, node);
+      node.right = build(nodeData.right, node);
+      return node;
+    };
+
+    tree.root = build(data, null);
+    return tree;
+  }
 }
 
 // Export for browser usage

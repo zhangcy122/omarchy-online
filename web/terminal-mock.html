@@ -59,19 +59,28 @@
     .prompt-prefix {
       color: #7aa2f7;
       font-weight: 700;
-      margin-right: 6px;
       white-space: nowrap;
+    }
+
+    .prompt-in {
+      color: #565f89;
+      margin: 0 4px;
     }
 
     .prompt-dir {
       color: #7dcfff;
-      margin-right: 6px;
+      font-weight: 600;
+    }
+
+    .prompt-branch {
+      color: #bb9af7;
+      margin-left: 6px;
     }
 
     .prompt-symbol {
-      color: #bb9af7;
+      color: #9ece6a;
       font-weight: 700;
-      margin-right: 8px;
+      margin: 0 6px;
     }
 
     .input-wrapper {
@@ -135,8 +144,10 @@
     <div id="history"></div>
     <div class="command-line" id="current-line">
       <span class="prompt-prefix">user@omarchy</span>
+      <span class="prompt-in">in</span>
       <span class="prompt-dir">~</span>
-      <span class="prompt-symbol">&gt;</span>
+      <span class="prompt-branch">on  main</span>
+      <span class="prompt-symbol">❯</span>
       <div class="input-wrapper">
         <span id="cmd-display" class="cmd-text"></span>
         <span class="cursor"></span>
@@ -154,6 +165,11 @@
     let currentInput = '';
     const cmdHistory = [];
     let historyIndex = -1;
+    let currentSessionId = null;
+
+    function formatPrompt() {
+      return `<span class="prompt-prefix">user@omarchy</span> <span class="prompt-in">in</span> <span class="prompt-dir">~</span> <span class="prompt-branch">on  main</span> <span class="prompt-symbol">❯</span>`;
+    }
 
     const FASTFETCH_ART = `
                    <span class="ansi-blue">-\`</span>                    <span class="ansi-cyan ansi-bold">user</span><span class="ansi-purple ansi-bold">@</span><span class="ansi-blue ansi-bold">omarchy</span>
@@ -188,15 +204,21 @@
     function executeCommand(cmd) {
       const trimmed = cmd.trim();
       if (!trimmed) {
-        appendOutput(`<div class="command-line"><span class="prompt-prefix">user@omarchy</span> <span class="prompt-dir">~</span> <span class="prompt-symbol">&gt;</span></div>`);
+        appendOutput(`<div class="command-line">${formatPrompt()}</div>`);
         return;
       }
 
       cmdHistory.push(trimmed);
       historyIndex = cmdHistory.length;
 
+      if (currentSessionId) {
+        try {
+          sessionStorage.setItem('omarchy_term_hist_' + currentSessionId, JSON.stringify(cmdHistory.slice(-50)));
+        } catch (e) {}
+      }
+
       // Print command entered
-      appendOutput(`<div class="command-line"><span class="prompt-prefix">user@omarchy</span> <span class="prompt-dir">~</span> <span class="prompt-symbol">&gt;</span> <span class="ansi-white">${escapeHtml(trimmed)}</span></div>`);
+      appendOutput(`<div class="command-line">${formatPrompt()} <span class="ansi-white">${escapeHtml(trimmed)}</span></div>`);
 
       const parts = trimmed.split(' ');
       const mainCmd = parts[0].toLowerCase();
@@ -404,11 +426,26 @@
       }
     });
 
-    // Check URL parameters for direct app launch
+    // Check URL parameters for direct app launch & session namespacing
     window.addEventListener('DOMContentLoaded', () => {
       focusInput();
       const params = new URLSearchParams(window.location.search);
       const appType = params.get('type') || 'terminal';
+      currentSessionId = params.get('session');
+
+      if (currentSessionId) {
+        appendOutput(`<div style="color: #7aa2f7; font-size: 11px; margin-bottom: 8px; border-bottom: 1px dashed #24283b; padding-bottom: 4px;"><span style="color: #9ece6a;">●</span> Attached to Zellij session: <strong style="color: #c0caf5;">${escapeHtml(currentSessionId)}</strong> (persistence active)</div>`);
+        try {
+          const savedHistory = sessionStorage.getItem('omarchy_term_hist_' + currentSessionId);
+          if (savedHistory) {
+            const parsed = JSON.parse(savedHistory);
+            if (Array.isArray(parsed)) {
+              cmdHistory.push(...parsed);
+              historyIndex = cmdHistory.length;
+            }
+          }
+        } catch (e) {}
+      }
 
       if (appType === 'nvim' || appType === 'editor') {
         executeCommand('nvim');
