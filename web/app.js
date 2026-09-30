@@ -77,7 +77,7 @@ function getTerminalUrl(type = 'terminal', wsId = currentWorkspace, winId = null
   if (isMockEnv) {
     return `terminal-mock.html?type=${encodeURIComponent(type)}&session=${encodeURIComponent(sessionId)}`;
   }
-  return `/zellij/?session=${encodeURIComponent(sessionId)}`;
+  return `/zellij/${encodeURIComponent(sessionId)}`;
 }
 
 function spawnWindow(wsId = currentWorkspace, options = {}) {

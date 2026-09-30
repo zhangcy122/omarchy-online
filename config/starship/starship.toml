@@ -1,0 +1,40 @@
+# Omarchy Online - Starship Tokyo Night Configuration
+# Matches Omarchy Arch Linux / Hyprland Prompt
+add_newline = false
+
+format = """
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$character"""
+
+[username]
+show_always = true
+style_user = "bold #7aa2f7"
+format = "[$user]($style)"
+
+[hostname]
+ssh_only = false
+style = "bold #7aa2f7"
+format = "@[omarchy]($style) "
+
+[directory]
+style = "bold #7dcfff"
+format = "in [$path]($style) "
+truncation_length = 3
+truncation_symbol = "…/"
+
+[git_branch]
+style = "bold #bb9af7"
+format = "on [$symbol$branch]($style) "
+symbol = " "
+
+[git_status]
+style = "bold #f7768e"
+format = "([$all_status$ahead_behind]($style) )"
+
+[character]
+success_symbol = "[❯](bold #9ece6a) "
+error_symbol = "[❯](bold #f7768e) "
