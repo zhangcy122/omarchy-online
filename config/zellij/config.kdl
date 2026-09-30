@@ -35,11 +35,12 @@ themes {
 // UI Options
 mouse_mode true
 copy_on_select true
-pane_frames true
+pane_frames false
 auto_layout true
 
-// Simplified UI off to preserve rich status bar and tabs
-simplified_ui false
+// Simplified UI on for clean borderless Alacritty-like terminal window
+simplified_ui true
+default_layout "compact"
 
 // Default shell
 default_shell "bash"

@@ -30,9 +30,11 @@ Usage: $0 [command]
 Commands:
   start          Start both Zellij Web daemon and Caddy reverse proxy
   stop           Stop both Zellij Web daemon and Caddy reverse proxy
+  restart        Restart both Zellij Web daemon and Caddy reverse proxy
   status         Check the running status of Zellij Web and Caddy
   token          Generate a new login token for the web interface
   list-tokens    List existing token names and creation dates
+  clean-sessions Terminate any lingering orphan sessions
   caddy-start    Start Caddy reverse proxy only
   caddy-stop     Stop Caddy reverse proxy only
   help           Show this help message
@@ -41,6 +43,13 @@ EOF
 }
 
 start_zellij() {
+    # Ensure Zellij user configuration directory and symlink exist
+    mkdir -p "${HOME}/.config/zellij"
+    ln -sfn "${ZELLIJ_CONFIG}" "${HOME}/.config/zellij/config.kdl"
+    if [ -f "${PROJECT_DIR}/config/starship/starship.toml" ]; then
+        ln -sfn "${PROJECT_DIR}/config/starship/starship.toml" "${HOME}/.config/starship.toml"
+    fi
+
     if "${ZELLIJ_BIN}" web --status 2>/dev/null | grep -q "online"; then
         echo "ℹ️  Zellij Web server is already running."
         "${ZELLIJ_BIN}" web --status
@@ -55,6 +64,12 @@ start_zellij() {
 stop_zellij() {
     echo "🛑 Stopping Zellij Web server..."
     "${ZELLIJ_BIN}" web --stop || true
+}
+
+clean_sessions() {
+    echo "🧹 Cleaning up orphan and temporary Zellij sessions..."
+    "${ZELLIJ_BIN}" kill-all-sessions -y 2>/dev/null || true
+    echo "✅ All dead sessions cleaned."
 }
 
 start_caddy() {
@@ -109,6 +124,17 @@ case "${1:-start}" in
         stop_caddy
         stop_zellij
         echo "✅ All services stopped."
+        ;;
+    restart)
+        stop_caddy
+        stop_zellij
+        sleep 1
+        start_zellij
+        start_caddy
+        echo "✅ Services restarted."
+        ;;
+    clean-sessions)
+        clean_sessions
         ;;
     status)
         show_status
