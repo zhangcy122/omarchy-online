@@ -32,12 +32,20 @@ document.addEventListener('DOMContentLoaded', () => {
     renderWorkspace(currentWorkspace);
   });
 
-  // Default launch: Open simulated browser window showcasing Omarchy intro & key features
-  spawnWindow(1, {
-    type: 'browser',
-    title: 'chromium ~ Omarchy Online: Hyprland Workspace for VPS',
-    url: 'browser-home.html'
+  // Automatically save desktop state before page unload
+  window.addEventListener('beforeunload', () => {
+    saveDesktopState();
   });
+
+  // Restore desktop state from localStorage or fallback to default welcome browser
+  const restored = restoreDesktopState();
+  if (!restored) {
+    spawnWindow(1, {
+      type: 'browser',
+      title: 'chromium ~ Omarchy Online: Hyprland Workspace for VPS',
+      url: 'browser-home.html'
+    });
+  }
 
   // Update badge if in GitHub Pages or Mock environment
   if (window.location.hostname.endsWith('github.io') || window.location.search.includes('mock=true')) {
@@ -53,27 +61,33 @@ document.addEventListener('DOMContentLoaded', () => {
 // 2. Window Manager (Spawn, Close, Focus, Float, Fullscreen)
 // ============================================================
 
-function getTerminalUrl(type = 'terminal') {
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function getTerminalUrl(type = 'terminal', wsId = currentWorkspace, winId = null) {
   if (type === 'browser') {
     return 'browser-home.html';
   }
+  const sessionId = `omarchy-ws${wsId}-${winId || 'term'}`;
   const isMockEnv = window.location.hostname.endsWith('github.io') ||
                     window.location.protocol === 'file:' ||
                     window.location.search.includes('mock=true');
   if (isMockEnv) {
-    return `terminal-mock.html?type=${encodeURIComponent(type)}`;
+    return `terminal-mock.html?type=${encodeURIComponent(type)}&session=${encodeURIComponent(sessionId)}`;
   }
-  return '/zellij/';
+  return `/zellij/?session=${encodeURIComponent(sessionId)}`;
 }
 
 function spawnWindow(wsId = currentWorkspace, options = {}) {
   const ws = workspaces[wsId];
   if (!ws) return null;
 
-  const winId = `win-${++windowCounter}`;
+  const winId = options.id || `win-${++windowCounter}`;
   const type = options.type || 'terminal';
   const title = options.title || `alacritty ~ user@omarchy:~ [${winId}]`;
-  const url = options.url || getTerminalUrl(type);
+  const url = options.url || getTerminalUrl(type, wsId, winId);
 
   const winEl = document.createElement('div');
   winEl.className = 'hypr-window';
@@ -84,7 +98,7 @@ function spawnWindow(wsId = currentWorkspace, options = {}) {
     <div class="window-titlebar">
       <div class="window-title-left">
         <span class="window-title-badge">${type}</span>
-        <span class="window-title-text">${title}</span>
+        <span class="window-title-text">${escapeHtml(title)}</span>
       </div>
       <div class="window-controls">
         <span class="win-dot min" title="Toggle Floating (SUPER + T)"></span>
@@ -107,6 +121,7 @@ function spawnWindow(wsId = currentWorkspace, options = {}) {
     wsId: wsId,
     title: title,
     type: type,
+    url: url,
     el: winEl,
     iframe: winEl.querySelector('iframe'),
     isFloating: false,
@@ -153,6 +168,7 @@ function spawnWindow(wsId = currentWorkspace, options = {}) {
   renderWorkspace(wsId);
   focusWindow(winId);
   updateWorkspaceIndicators();
+  saveDesktopState();
 
   showToast(`Window opened [${type}] on Workspace ${wsId}`);
   return winObj;
@@ -212,6 +228,7 @@ function closeWindow(winId) {
   }
 
   updateWorkspaceIndicators();
+  saveDesktopState();
   showToast('Window closed');
 }
 
@@ -268,6 +285,7 @@ function toggleFloating(winId = null) {
   }
 
   renderWorkspace(currentWorkspace);
+  saveDesktopState();
 }
 
 function toggleWindowFullscreen(winId = null) {
@@ -292,6 +310,7 @@ function toggleWindowFullscreen(winId = null) {
     win.el.classList.remove('fullscreen');
     showToast('Window Restored');
   }
+  saveDesktopState();
 }
 
 let isDesktopShown = false;
@@ -329,6 +348,7 @@ function toggleSplitDirection() {
   const toggled = ws.tree.toggleSplit(ws.focusedId);
   if (toggled) {
     renderWorkspace(currentWorkspace);
+    saveDesktopState();
     showToast('Toggled Split Direction (SUPER + J)');
   }
 }
@@ -414,6 +434,7 @@ function moveFocusedWindowToWorkspace(targetWsId) {
   renderWorkspace(currentWorkspace);
   renderWorkspace(targetWsId);
   updateWorkspaceIndicators();
+  saveDesktopState();
   showToast(`Moved window to Workspace ${targetWsId}`);
 }
 
@@ -528,6 +549,7 @@ function switchWorkspace(id) {
     }
   }
 
+  saveDesktopState();
   showToast(`Switched to Workspace ${id}`);
 }
 
@@ -539,6 +561,203 @@ function nextWorkspace() {
 function prevWorkspace() {
   const prev = currentWorkspace <= 1 ? 9 : currentWorkspace - 1;
   switchWorkspace(prev);
+}
+
+// ============================================================
+// 4.1 Desktop Layout Persistence & Restoration Engine
+// ============================================================
+
+let isResettingLayout = false;
+
+function saveDesktopState() {
+  if (isResettingLayout) return;
+  try {
+    const state = {
+      version: 1,
+      currentWorkspace: currentWorkspace,
+      windowCounter: windowCounter,
+      workspaces: {}
+    };
+
+    for (let id = 1; id <= 9; id++) {
+      const ws = workspaces[id];
+      state.workspaces[id] = {
+        id: id,
+        focusedId: ws.focusedId,
+        tree: ws.tree ? ws.tree.serialize() : null,
+        windows: ws.windows.map(w => ({
+          id: w.id,
+          wsId: w.wsId,
+          title: w.title,
+          type: w.type,
+          url: w.url || (w.iframe ? w.iframe.getAttribute('src') : ''),
+          isFloating: !!w.isFloating,
+          isFullscreen: !!w.isFullscreen,
+          style: {
+            left: w.el ? w.el.style.left : '',
+            top: w.el ? w.el.style.top : '',
+            width: w.el ? w.el.style.width : '',
+            height: w.el ? w.el.style.height : ''
+          }
+        }))
+      };
+    }
+
+    localStorage.setItem('omarchy_desktop_state', JSON.stringify(state));
+  } catch (err) {
+    console.warn('saveDesktopState error:', err);
+  }
+}
+
+function restoreDesktopState() {
+  try {
+    const raw = localStorage.getItem('omarchy_desktop_state');
+    if (!raw) return false;
+    const state = JSON.parse(raw);
+    if (!state || !state.workspaces) return false;
+
+    let totalWindows = 0;
+    for (let i = 1; i <= 9; i++) {
+      if (state.workspaces[i] && Array.isArray(state.workspaces[i].windows)) {
+        totalWindows += state.workspaces[i].windows.length;
+      }
+    }
+    if (totalWindows === 0) return false;
+
+    const container = document.getElementById('windows-container');
+    if (container) {
+      container.innerHTML = '';
+    }
+
+    windowCounter = state.windowCounter || 0;
+
+    for (let i = 1; i <= 9; i++) {
+      const wsData = state.workspaces[i];
+      const ws = workspaces[i];
+      ws.windows = [];
+      ws.focusedId = wsData ? wsData.focusedId : null;
+      const windowMap = {};
+
+      if (wsData && Array.isArray(wsData.windows)) {
+        for (const winData of wsData.windows) {
+          const winEl = document.createElement('div');
+          winEl.className = 'hypr-window';
+          winEl.id = winData.id;
+          winEl.setAttribute('data-ws', i);
+
+          if (winData.isFloating) {
+            winEl.classList.add('floating');
+            if (winData.style) {
+              winEl.style.left = winData.style.left || '10%';
+              winEl.style.top = winData.style.top || '15%';
+              winEl.style.width = winData.style.width || '800px';
+              winEl.style.height = winData.style.height || '500px';
+            }
+          }
+          if (winData.isFullscreen) {
+            winEl.classList.add('fullscreen');
+          }
+
+          winEl.innerHTML = `
+            <div class="window-titlebar">
+              <div class="window-title-left">
+                <span class="window-title-badge">${winData.type}</span>
+                <span class="window-title-text">${escapeHtml(winData.title)}</span>
+              </div>
+              <div class="window-controls">
+                <span class="win-dot min" title="Toggle Floating (SUPER + T)"></span>
+                <span class="win-dot max" title="Toggle Fullscreen (SUPER + F)"></span>
+                <span class="win-dot close" title="Close Window (SUPER + W / Q)"></span>
+              </div>
+            </div>
+            <div class="window-body">
+              <iframe class="terminal-frame" src="${winData.url}" allow="clipboard-read; clipboard-write; fullscreen"></iframe>
+            </div>
+          `;
+
+          if (container) {
+            container.appendChild(winEl);
+          }
+
+          const winObj = {
+            id: winData.id,
+            wsId: i,
+            title: winData.title,
+            type: winData.type,
+            url: winData.url,
+            el: winEl,
+            iframe: winEl.querySelector('iframe'),
+            isFloating: !!winData.isFloating,
+            isFullscreen: !!winData.isFullscreen,
+            rect: null
+          };
+
+          ws.windows.push(winObj);
+          windowMap[winData.id] = winObj;
+
+          winEl.addEventListener('mousedown', () => {
+            focusWindow(winData.id);
+          });
+          const iframeEl = winEl.querySelector('iframe');
+          iframeEl?.addEventListener('load', () => {
+            try {
+              iframeEl.contentWindow?.addEventListener('keydown', handleHyprlandKeydown);
+            } catch (err) {}
+          });
+          winEl.querySelector('.win-dot.close')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeWindow(winData.id);
+          });
+          winEl.querySelector('.win-dot.min')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleFloating(winData.id);
+          });
+          winEl.querySelector('.win-dot.max')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleWindowFullscreen(winData.id);
+          });
+        }
+      }
+
+      if (wsData && wsData.tree) {
+        ws.tree = window.DwindleTree.deserialize(wsData.tree, windowMap);
+      } else {
+        ws.tree = new window.DwindleTree();
+      }
+    }
+
+    const targetWs = (state.currentWorkspace >= 1 && state.currentWorkspace <= 9) ? state.currentWorkspace : 1;
+    switchWorkspace(targetWs);
+    if (workspaces[targetWs].focusedId) {
+      focusWindow(workspaces[targetWs].focusedId);
+    }
+    updateWorkspaceIndicators();
+    showToast('Desktop layout restored from session');
+    return true;
+  } catch (err) {
+    console.error('Failed to restore desktop state:', err);
+    return false;
+  }
+}
+
+function resetDesktopLayout() {
+  isResettingLayout = true;
+  try {
+    localStorage.removeItem('omarchy_desktop_state');
+  } catch (e) {}
+  location.reload();
+}
+
+function swapFocusedWindowDirection(direction) {
+  const ws = workspaces[currentWorkspace];
+  if (!ws || !ws.focusedId) return;
+
+  const swappedWinId = ws.tree.moveWindowDirection(ws.focusedId, direction);
+  if (swappedWinId) {
+    renderWorkspace(currentWorkspace);
+    saveDesktopState();
+    showToast(`Swapped window with ${direction} neighbor`);
+  }
 }
 
 // ============================================================
@@ -642,7 +861,8 @@ const LAUNCHER_ITEMS = [
   { id: 'browser', icon: '🌐', label: 'Chromium Browser (Omarchy Welcome)', sub: 'Launch browser showcasing Omarchy intro & key features (SUPER + SHIFT + RETURN)', category: 'Apps', action: () => spawnWindow(currentWorkspace, { type: 'browser', title: 'chromium ~ Omarchy Online: Hyprland Workspace for VPS', url: 'browser-home.html' }) },
   { id: 'github', icon: '⭐', label: 'GitHub Repository (Source Code)', sub: 'View source code & documentation on GitHub', category: 'System', action: () => window.open('https://github.com/zhangcy122/omarchy-online', '_blank') },
   { id: 'keys', icon: '⌨️', label: 'Omarchy Keybindings Cheatsheet', sub: 'View all shortcut keys (SUPER + K)', category: 'System', action: () => window.toggleKeybindingsCheatsheet?.() },
-  { id: 'fullscreen', icon: '⛶', label: 'Toggle Fullscreen Mode', sub: 'Lock browser keyboard for full immersion (SUPER + F)', category: 'System', action: () => toggleBrowserFullscreen() }
+  { id: 'fullscreen', icon: '⛶', label: 'Toggle Fullscreen Mode', sub: 'Lock browser keyboard for full immersion (SUPER + F)', category: 'System', action: () => toggleBrowserFullscreen() },
+  { id: 'reset-layout', icon: '🔄', label: 'Reset Desktop Layout', sub: 'Clear saved window state and reload fresh desktop', category: 'System', action: resetDesktopLayout }
 ];
 
 let selectedItemIndex = 0;
@@ -797,7 +1017,21 @@ function initHyprlandKeybindings() {
   window.addEventListener('keydown', handleHyprlandKeydown);
 }
 
+let lastKeydownStamp = 0;
+let lastKeydownSignature = '';
+
 function handleHyprlandKeydown(e) {
+  if (e._hyprHandled) return;
+  e._hyprHandled = true;
+
+  const now = Date.now();
+  const signature = `${e.code}-${e.metaKey}-${e.altKey}-${e.ctrlKey}-${e.shiftKey}`;
+  if (now - lastKeydownStamp < 120 && lastKeydownSignature === signature) {
+    return;
+  }
+  lastKeydownStamp = now;
+  lastKeydownSignature = signature;
+
   // Check if SUPER (Meta) OR ALT (Option fallback) is pressed
   const isSuper = e.metaKey || e.altKey;
 
@@ -915,6 +1149,30 @@ function handleHyprlandKeydown(e) {
     e.preventDefault();
     focusAdjacentWindow('down');
     return;
+  }
+
+  // 11.1 SUPER + SHIFT + Arrow Keys / HJKL: Swap window position
+  if (e.shiftKey && !e.ctrlKey) {
+    if (e.code === 'ArrowLeft' || e.code === 'KeyH') {
+      e.preventDefault();
+      swapFocusedWindowDirection('left');
+      return;
+    }
+    if (e.code === 'ArrowRight' || e.code === 'KeyL') {
+      e.preventDefault();
+      swapFocusedWindowDirection('right');
+      return;
+    }
+    if (e.code === 'ArrowUp' || e.code === 'KeyK') {
+      e.preventDefault();
+      swapFocusedWindowDirection('up');
+      return;
+    }
+    if (e.code === 'ArrowDown' || e.code === 'KeyJ') {
+      e.preventDefault();
+      swapFocusedWindowDirection('down');
+      return;
+    }
   }
 
   // 12. SUPER + 1..9: Switch workspace / SUPER + SHIFT + 1..9: Move window
