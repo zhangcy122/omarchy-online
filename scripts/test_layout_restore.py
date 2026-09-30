@@ -51,10 +51,10 @@ async def run_layout_restore_test():
             print(f"[*] Windows count on WS1 after split: {len(windows_ws1)}")
             assert len(windows_ws1) == 2, f"Expected 2 windows on WS1, got {len(windows_ws1)}"
 
-            # Verify session parameter on terminal iframe
+            # Verify session in terminal iframe
             iframe_src = await page.evaluate("() => document.querySelector('#win-2 iframe')?.getAttribute('src')")
             print(f"[*] win-2 iframe src: {iframe_src}")
-            assert "session=omarchy-ws1-win-2" in (iframe_src or ""), f"Session not in iframe URL: {iframe_src}"
+            assert "omarchy-ws1-win-2" in (iframe_src or ""), f"Session not in iframe URL: {iframe_src}"
 
             # Capture initial positions
             win1_box = await page.evaluate("() => { const el = document.getElementById('win-1'); return { left: el.style.left, top: el.style.top, width: el.style.width, height: el.style.height }; }")
