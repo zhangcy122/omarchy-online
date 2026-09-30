@@ -129,6 +129,22 @@ function spawnWindow(wsId = currentWorkspace, options = {}) {
     rect: null
   };
 
+  if (winObj.iframe) {
+    winObj.iframe.style.background = '#1a1b26';
+    winObj.iframe.addEventListener('load', () => {
+      try {
+        const doc = winObj.iframe.contentDocument || winObj.iframe.contentWindow.document;
+        if (doc) {
+          doc.body.style.background = '#1a1b26';
+          const term = doc.getElementById('terminal');
+          if (term) term.style.background = '#1a1b26';
+        }
+      } catch (e) {
+        // Cross-origin fallback guard
+      }
+    });
+  }
+
   ws.windows.push(winObj);
 
   // Insert into Hyprland Dwindle BSP Tree
@@ -699,8 +715,17 @@ function restoreDesktopState() {
             focusWindow(winData.id);
           });
           const iframeEl = winEl.querySelector('iframe');
+          if (iframeEl) {
+            iframeEl.style.background = '#1a1b26';
+          }
           iframeEl?.addEventListener('load', () => {
             try {
+              const doc = iframeEl.contentDocument || iframeEl.contentWindow?.document;
+              if (doc) {
+                doc.body.style.background = '#1a1b26';
+                const term = doc.getElementById('terminal');
+                if (term) term.style.background = '#1a1b26';
+              }
               iframeEl.contentWindow?.addEventListener('keydown', handleHyprlandKeydown);
             } catch (err) {}
           });
